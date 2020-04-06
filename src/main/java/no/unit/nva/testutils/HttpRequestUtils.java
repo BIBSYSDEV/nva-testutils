@@ -6,12 +6,17 @@ import static org.mockito.Mockito.when;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 import org.apache.http.HttpStatus;
 import org.mockito.invocation.InvocationOnMock;
 
 public class HttpRequestUtils {
 
-    public HttpResponse<String> responseEchoingRequestBody(InvocationOnMock invocation) {
+    public CompletableFuture<HttpResponse<String>> echoRequestAsFuture(InvocationOnMock invocation) {
+        return CompletableFuture.completedFuture(echoRequest(invocation));
+    }
+
+    public HttpResponse<String> echoRequest(InvocationOnMock invocation) {
         HttpRequest request = invocation.getArgument(0);
         String body = RequestBodyReader.requestBody(request);
         HttpHeaders headers = mockHeaders(request);
