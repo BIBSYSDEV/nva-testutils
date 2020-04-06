@@ -11,27 +11,22 @@ import org.mockito.invocation.InvocationOnMock;
 
 public class HttpRequestUtils {
 
-    private final HttpRequest request;
-
-    public HttpRequestUtils(HttpRequest request) {
-        this.request = request;
-    }
 
     public HttpResponse<String> responseEchoingRequestBody(InvocationOnMock invocation) {
         HttpRequest request = invocation.getArgument(0);
         String body = RequestBodyReader.requestBody(request);
-        return echoRequest(body);
+        HttpHeaders headers = mockHeaders(request);
+        return mockRequest(body,headers);
     }
-
-    protected HttpResponse<String> echoRequest(String body) {
+    protected HttpResponse<String> mockRequest(String body, HttpHeaders headers) {
         HttpResponse<String> response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(HttpStatus.SC_OK);
         when(response.body()).thenReturn(body);
-        when(response.headers()).thenReturn(echoHeaders());
+        when(response.headers()).thenReturn(headers);
         return response;
     }
 
-    protected HttpHeaders echoHeaders() {
+    protected HttpHeaders mockHeaders(HttpRequest request) {
         return request.headers();
     }
 }
