@@ -11,13 +11,13 @@ import org.mockito.invocation.InvocationOnMock;
 
 public class HttpRequestUtils {
 
-
     public HttpResponse<String> responseEchoingRequestBody(InvocationOnMock invocation) {
         HttpRequest request = invocation.getArgument(0);
         String body = RequestBodyReader.requestBody(request);
         HttpHeaders headers = mockHeaders(request);
-        return mockRequest(body,headers);
+        return mockRequest(body, headers);
     }
+
     protected HttpResponse<String> mockRequest(String body, HttpHeaders headers) {
         HttpResponse<String> response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(HttpStatus.SC_OK);
