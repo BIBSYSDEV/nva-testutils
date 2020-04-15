@@ -23,6 +23,7 @@ public class HttpRequestUtils {
         return mockRequest(body, headers);
     }
 
+    @SuppressWarnings("unchecked")
     protected HttpResponse<String> mockRequest(String body, HttpHeaders headers) {
         HttpResponse<String> response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(HttpStatus.SC_OK);
