@@ -13,6 +13,7 @@ public class TestLogger implements LambdaLogger {
 
     @Override
     public void log(String message) {
+        System.out.print(message);
         logs.append(message);
         logs.append(System.lineSeparator());
     }
