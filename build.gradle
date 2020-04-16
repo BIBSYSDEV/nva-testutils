@@ -8,11 +8,18 @@ repositories {
     jcenter()
 }
 
+def jupiterVersion = "5.6.1"
+
 dependencies {
-    implementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.1'
+
     implementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
     implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.12'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.0'
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jupiterVersion
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+
 }
 
 test {
