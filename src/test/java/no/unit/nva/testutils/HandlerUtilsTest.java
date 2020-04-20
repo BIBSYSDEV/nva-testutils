@@ -1,6 +1,7 @@
 package no.unit.nva.testutils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,8 +17,10 @@ class HandlerUtilsTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final String VALUE = "value";
+    public static final String SOME_KEY = "SomeKey";
     public static final String SOME_HEADER_VALUE = "SomeHeaderValue";
-    public static final String SOME_HEADER = "SomeHeader";
+    public static final String SOME_QUERY_VALUE = "SomeQueryValue";
+    public static final String SOME_PATH_VALUE = "SomePathValue";
 
     @Test
     public void requestObjectToApiGatewayRequestStringReturnsValidJsonObjectForNullHeaders()
@@ -29,28 +32,41 @@ class HandlerUtilsTest {
     }
 
 
-
     @Test
-    public void requestObjectToApiGatewayRequestStringReturnsValidJsonObjectForNonNullHeaders()
+    public void requestObjectToApiGatewayRequestStringReturnsValidJsonObjectForNonPathParameters()
         throws JsonProcessingException {
-        String requestString = gatewayRequestWithNonNullHeaders();
+        String requestString = gatewayRequestWithPathAndQueryParameters();
         assertNotNull(requestString);
-        RequestBody actual= extractBodyFromSerializedRequest(requestString);
-        assertThat(actual.getMyField(),is(equalTo(VALUE)));
+        RequestBody actual = extractBodyFromSerializedRequest(requestString);
+        JsonNode json = OBJECT_MAPPER.readTree(requestString);
+        Map<String, String> headers = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.HEADERS_FIELD), Map.class);
+        Map<String, String> pathParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.PATH_PARAMETERS),
+            Map.class);
+        Map<String, String> queryParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.QUERY_PARAMETERS),
+            Map.class);
+
+        assertThat(actual.getMyField(), is(equalTo(VALUE)));
+        assertThat(headers, hasEntry(SOME_KEY, SOME_HEADER_VALUE));
+        assertThat(pathParameters, hasEntry(SOME_KEY, SOME_PATH_VALUE));
+        assertThat(queryParameters, hasEntry(SOME_KEY, SOME_QUERY_VALUE));
+    }
+
+    private String gatewayRequestWithPathAndQueryParameters() throws JsonProcessingException {
+        RequestBody requestBody = new RequestBody();
+        requestBody.setMyField(VALUE);
+        Map<String, String> headers = new HashMap<>();
+        Map<String, String> pathParams = new HashMap<>();
+        Map<String, String> queryParams = new HashMap<>();
+        headers.put(SOME_KEY, SOME_HEADER_VALUE);
+        pathParams.put(SOME_KEY, SOME_PATH_VALUE);
+        queryParams.put(SOME_KEY, SOME_QUERY_VALUE);
+        return HandlerUtils.requestObjectToApiGatewayRequestString(requestBody, headers, pathParams, queryParams);
     }
 
     private String gatewayRequestWithNullHeaders() throws JsonProcessingException {
         RequestBody requestBody = new RequestBody();
         requestBody.setMyField(VALUE);
-        return HandlerUtils.requestObjectToApiGatewayRequestString(requestBody, null);
-    }
-
-    private String gatewayRequestWithNonNullHeaders() throws JsonProcessingException {
-        RequestBody requestBody = new RequestBody();
-        requestBody.setMyField(VALUE);
-        Map<String,String> headers= new HashMap<String,String>();
-        headers.put(SOME_HEADER, SOME_HEADER_VALUE);
-        return HandlerUtils.requestObjectToApiGatewayRequestString(requestBody, headers);
+        return HandlerUtils.requestObjectToApiGatewayRequestString(requestBody, null, null, null);
     }
 
     private RequestBody extractBodyFromSerializedRequest(String requestString) throws JsonProcessingException {
