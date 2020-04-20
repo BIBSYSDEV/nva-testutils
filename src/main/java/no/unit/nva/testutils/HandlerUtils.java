@@ -17,7 +17,7 @@ public final class HandlerUtils {
 
     public static <T> InputStream requestObjectToInputStream(T requestObject, Map<String, String> headers)
         throws JsonProcessingException {
-        String requestString= requestObjectToString(requestObject,headers);
+        String requestString = requestObjectToString(requestObject, headers);
         return new ByteArrayInputStream(requestString.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -28,7 +28,6 @@ public final class HandlerUtils {
         root.put(BODY_FIELD, requestObjString);
         JsonNode headersNode = OBJECT_MAPPER.convertValue(headers, JsonNode.class);
         root.set(HEADERS_FIELD, headersNode);
-        return  OBJECT_MAPPER.writeValueAsString(root);
-
+        return OBJECT_MAPPER.writeValueAsString(root);
     }
 }

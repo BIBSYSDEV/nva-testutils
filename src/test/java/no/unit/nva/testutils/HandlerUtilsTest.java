@@ -17,8 +17,8 @@ class HandlerUtilsTest {
         assertNotNull(requestString);
     }
 
+    private static class RequestBody {
 
-    private static class RequestBody{
         private String myField;
 
         public String getMyField() {
@@ -28,8 +28,5 @@ class HandlerUtilsTest {
         public void setMyField(String myField) {
             this.myField = myField;
         }
-
-
     }
-
 }
