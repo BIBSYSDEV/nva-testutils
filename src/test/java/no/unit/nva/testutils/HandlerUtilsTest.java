@@ -13,7 +13,7 @@ class HandlerUtilsTest {
     public void requestBodyToStringReturnsValidJsonObjectForNullHeaders() throws JsonProcessingException {
         RequestBody requestBody = new RequestBody();
         requestBody.setMyField(VALUE);
-        String requestString = HandlerUtils.requestObjectToString(requestBody, null);
+        String requestString = HandlerUtils.requestObjectToApiGatewayRequestStrig(requestBody, null);
         assertNotNull(requestString);
     }
 

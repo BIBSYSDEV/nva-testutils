@@ -15,13 +15,14 @@ public final class HandlerUtils {
     public static final String BODY_FIELD = "body";
     public static final String HEADERS_FIELD = "headers";
 
-    public static <T> InputStream requestObjectToInputStream(T requestObject, Map<String, String> headers)
+    public static <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject,
+                                                                             Map<String, String> headers)
         throws JsonProcessingException {
-        String requestString = requestObjectToString(requestObject, headers);
+        String requestString = requestObjectToApiGatewayRequestString(requestObject, headers);
         return new ByteArrayInputStream(requestString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static <T> String requestObjectToString(T requestObject, Map<String, String> headers)
+    public static <T> String requestObjectToApiGatewayRequestString(T requestObject, Map<String, String> headers)
         throws JsonProcessingException {
         ObjectNode root = OBJECT_MAPPER.createObjectNode();
         String requestObjString = OBJECT_MAPPER.writeValueAsString(requestObject);
