@@ -31,7 +31,6 @@ class HandlerUtilsTest {
         assertThat(actual.getMyField(), is(equalTo(VALUE)));
     }
 
-
     @Test
     public void requestObjectToApiGatewayRequestStringReturnsValidJsonObjectForNonPathParameters()
         throws JsonProcessingException {
