@@ -20,11 +20,11 @@ public class HttpRequestUtils {
         HttpRequest request = invocation.getArgument(0);
         String body = RequestBodyReader.requestBody(request);
         HttpHeaders headers = mockHeaders(request);
-        return mockRequest(body, headers);
+        return mockResponse(body, headers);
     }
 
     @SuppressWarnings("unchecked")
-    protected HttpResponse<String> mockRequest(String body, HttpHeaders headers) {
+    protected HttpResponse<String> mockResponse(String body, HttpHeaders headers) {
         HttpResponse<String> response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(HttpStatus.SC_OK);
         when(response.body()).thenReturn(body);
