@@ -18,6 +18,10 @@ public final class HandlerUtils {
 
     private final ObjectMapper objectMapper;
 
+    public HandlerUtils() {
+        this(new ObjectMapper());
+    }
+
     public HandlerUtils(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
