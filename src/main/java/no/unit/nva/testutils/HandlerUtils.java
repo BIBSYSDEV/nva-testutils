@@ -11,20 +11,25 @@ import java.util.Map;
 
 public final class HandlerUtils {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final String BODY_FIELD = "body";
     public static final String HEADERS_FIELD = "headers";
     public static final String PATH_PARAMETERS = "pathParameters";
     public static final String QUERY_PARAMETERS = "queryStringParameters";
 
-    public static <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject)
+    private final ObjectMapper objectMapper;
+
+    public HandlerUtils(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject)
         throws JsonProcessingException {
         String requestString = requestObjectToApiGatewayRequestString(requestObject, null, null,
             null);
         return new ByteArrayInputStream(requestString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject,
+    public <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject,
                                                                              Map<String, String> headers)
         throws JsonProcessingException {
         String requestString = requestObjectToApiGatewayRequestString(requestObject, headers, null,
@@ -32,7 +37,7 @@ public final class HandlerUtils {
         return new ByteArrayInputStream(requestString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject,
+    public <T> InputStream requestObjectToApiGatewayRequestInputSteam(T requestObject,
                                                                              Map<String, String> headers,
                                                                              Map<String, String> pathParameters,
                                                                              Map<String, String> queryParameters)
@@ -42,20 +47,20 @@ public final class HandlerUtils {
         return new ByteArrayInputStream(requestString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static <T> String requestObjectToApiGatewayRequestString(T requestObject,
+    public <T> String requestObjectToApiGatewayRequestString(T requestObject,
                                                                     Map<String, String> headers,
                                                                     Map<String, String> pathParameters,
                                                                     Map<String, String> queryParameters)
         throws JsonProcessingException {
-        ObjectNode root = OBJECT_MAPPER.createObjectNode();
-        String requestObjString = OBJECT_MAPPER.writeValueAsString(requestObject);
+        ObjectNode root = objectMapper.createObjectNode();
+        String requestObjString = objectMapper.writeValueAsString(requestObject);
         root.put(BODY_FIELD, requestObjString);
-        JsonNode headersNode = OBJECT_MAPPER.convertValue(headers, JsonNode.class);
+        JsonNode headersNode = objectMapper.convertValue(headers, JsonNode.class);
         root.set(HEADERS_FIELD, headersNode);
-        JsonNode pathParamsNode = OBJECT_MAPPER.convertValue(pathParameters, JsonNode.class);
-        JsonNode queryParametersNode = OBJECT_MAPPER.convertValue(queryParameters, JsonNode.class);
+        JsonNode pathParamsNode = objectMapper.convertValue(pathParameters, JsonNode.class);
+        JsonNode queryParametersNode = objectMapper.convertValue(queryParameters, JsonNode.class);
         root.set(PATH_PARAMETERS, pathParamsNode);
         root.set(QUERY_PARAMETERS, queryParametersNode);
-        return OBJECT_MAPPER.writeValueAsString(root);
+        return objectMapper.writeValueAsString(root);
     }
 }

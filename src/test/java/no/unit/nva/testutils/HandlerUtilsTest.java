@@ -59,13 +59,13 @@ class HandlerUtilsTest {
         headers.put(SOME_KEY, SOME_HEADER_VALUE);
         pathParams.put(SOME_KEY, SOME_PATH_VALUE);
         queryParams.put(SOME_KEY, SOME_QUERY_VALUE);
-        return HandlerUtils.requestObjectToApiGatewayRequestString(requestBody, headers, pathParams, queryParams);
+        return new HandlerUtils(OBJECT_MAPPER).requestObjectToApiGatewayRequestString(requestBody, headers, pathParams, queryParams);
     }
 
     private String gatewayRequestWithNullHeaders() throws JsonProcessingException {
         RequestBody requestBody = new RequestBody();
         requestBody.setMyField(VALUE);
-        return HandlerUtils.requestObjectToApiGatewayRequestString(requestBody, null, null, null);
+        return new HandlerUtils(OBJECT_MAPPER).requestObjectToApiGatewayRequestString(requestBody, null, null, null);
     }
 
     private RequestBody extractBodyFromSerializedRequest(String requestString) throws JsonProcessingException {
