@@ -1,15 +1,14 @@
 package no.unit.nva.testutils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.InputStream;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class HandlerRequestBuilderTest {
@@ -17,25 +16,22 @@ public class HandlerRequestBuilderTest {
     public static final String KEY = "key";
     public static final String VALUE = "value";
     public static final String BODY = "body";
+    public static final String HEADERS = "headers";
     public static final String PATH_PARAMETERS = "pathParameters";
     public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String REQUEST_CONTEXT = "requestContext";
 
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    public void setUp() {
-        objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
+    // Can not use ObjectMapper from nva-commons because it would create a circular dependency
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void buildReturnsEmptyRequestOnNoArguments() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
             .build();
 
-        Map map = toMap(request);
-        assertNull(map.get("body"));
+        Map mapWithNullBody = toMap(request);
+        assertThat(mapWithNullBody.get(BODY), nullValue());
+
     }
 
     @Test
@@ -44,8 +40,8 @@ public class HandlerRequestBuilderTest {
             .withBody(VALUE)
             .build();
 
-        Map map = toMap(request);
-        assertEquals(map.get(BODY), VALUE);
+        Map mapWithBody = toMap(request);
+        assertThat(mapWithBody.get(BODY), equalTo(VALUE));
     }
 
     @Test
@@ -54,8 +50,8 @@ public class HandlerRequestBuilderTest {
             .withHeaders(Map.of(KEY, VALUE))
             .build();
 
-        Map map = toMap(request);
-        assertNotNull(map.get("headers"));
+        Map mapWithHeaders = toMap(request);
+        assertThat(mapWithHeaders.get(HEADERS), notNullValue());
     }
 
     @Test
@@ -64,8 +60,8 @@ public class HandlerRequestBuilderTest {
             .withQueryParameters(Map.of(KEY, VALUE))
             .build();
 
-        Map map = toMap(request);
-        assertNotNull(map.get(QUERY_PARAMETERS));
+        Map mapWithQueryParameters = toMap(request);
+        assertThat(mapWithQueryParameters.get(QUERY_PARAMETERS), notNullValue());
     }
 
     @Test
@@ -74,8 +70,8 @@ public class HandlerRequestBuilderTest {
             .withPathParameters(Map.of(KEY, VALUE))
             .build();
 
-        Map map = toMap(request);
-        assertNotNull(map.get(PATH_PARAMETERS));
+        Map mapWthPathParameters = toMap(request);
+        assertThat(mapWthPathParameters.get(PATH_PARAMETERS), notNullValue());
     }
 
     @Test
@@ -84,8 +80,8 @@ public class HandlerRequestBuilderTest {
             .withRequestContext(Map.of(KEY, VALUE))
             .build();
 
-        Map map = toMap(request);
-        assertNotNull(map.get(REQUEST_CONTEXT));
+        Map mapWithRequestContext = toMap(request);
+        assertThat(mapWithRequestContext.get(REQUEST_CONTEXT), notNullValue());
     }
 
     private Map<String,Object> toMap(InputStream inputStream) throws JsonProcessingException {

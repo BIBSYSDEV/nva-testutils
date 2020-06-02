@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class HandlerRequestBuilder<T> {
 
+    public static final String DELIMITER = "\n";
     @JsonProperty("body")
     private T body;
     @JsonProperty("headers")
@@ -62,6 +63,6 @@ public class HandlerRequestBuilder<T> {
     public static String toString(InputStream inputStream) {
         return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
             .lines()
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining(DELIMITER));
     }
 }

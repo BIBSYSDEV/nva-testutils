@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * @deprecated use {@link HandlerRequestBuilder}.
+ */
 @Deprecated
 public final class HandlerUtils {
 
@@ -60,6 +63,7 @@ public final class HandlerUtils {
             .withHeaders(headers)
             .withPathParameters(pathParameters)
             .withQueryParameters(queryParameters)
+            // no support for requestContext, use HandlerRequestBuilder instead
             .build();
 
         return HandlerRequestBuilder.toString(inputStream);
