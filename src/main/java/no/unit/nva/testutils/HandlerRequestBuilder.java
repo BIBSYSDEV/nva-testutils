@@ -13,26 +13,30 @@ import java.util.stream.Collectors;
 
 public class HandlerRequestBuilder<T> {
 
-    public static final String DELIMITER = "\n";
     @JsonProperty("body")
-    private T body;
+    private String body;
     @JsonProperty("headers")
     private Map<String, String> headers;
-    @JsonProperty("queryParameters")
+    @JsonProperty("queryStringParameters")
     private Map<String, String> queryParameters;
     @JsonProperty("pathParameters")
     private Map<String, String> pathParameters;
     @JsonProperty("requestContext")
     private Map<String, Object> requestContext;
 
+    public static final String DELIMITER = "\n";
     private final transient ObjectMapper objectMapper;
 
     public HandlerRequestBuilder(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public HandlerRequestBuilder<T> withBody(T body) {
-        this.body = body;
+    public HandlerRequestBuilder<T> withBody(T body) throws JsonProcessingException {
+        if (body instanceof String) {
+            this.body = (String)body;
+        } else {
+            this.body = objectMapper.writeValueAsString(body);
+        }
         return this;
     }
 

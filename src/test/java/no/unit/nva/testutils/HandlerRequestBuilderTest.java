@@ -18,7 +18,7 @@ public class HandlerRequestBuilderTest {
     public static final String BODY = "body";
     public static final String HEADERS = "headers";
     public static final String PATH_PARAMETERS = "pathParameters";
-    public static final String QUERY_PARAMETERS = "queryParameters";
+    public static final String QUERY_PARAMETERS = "queryStringParameters";
     public static final String REQUEST_CONTEXT = "requestContext";
 
     // Can not use ObjectMapper from nva-commons because it would create a circular dependency
@@ -35,13 +35,23 @@ public class HandlerRequestBuilderTest {
     }
 
     @Test
-    public void buildReturnsRequestWithBodyWhenWithBody() throws Exception {
+    public void buildReturnsRequestWithBodyWhenStringInput() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
             .withBody(VALUE)
             .build();
 
         Map mapWithBody = toMap(request);
         assertThat(mapWithBody.get(BODY), equalTo(VALUE));
+    }
+
+    @Test
+    public void buildReturnsRequestWithBodyWhenMapInput() throws Exception {
+        InputStream request = new HandlerRequestBuilder<Map>(objectMapper)
+            .withBody(Map.of(KEY, VALUE))
+            .build();
+
+        Map mapWithBody = toMap(request);
+        assertThat(mapWithBody.get(BODY), notNullValue());
     }
 
     @Test
