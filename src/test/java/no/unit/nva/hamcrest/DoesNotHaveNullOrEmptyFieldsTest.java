@@ -36,7 +36,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertTrue(matcher.matches(testObject));
-        assertThat(testObject,doesNotHaveNullOrEmptyFields());
+        assertThat(testObject, doesNotHaveNullOrEmptyFields());
     }
 
     @ParameterizedTest
@@ -50,13 +50,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject,"StringField");
-    }
-
-    private void assertErrorMessageContainsField(TestClass testObject,String fieldName) {
-        Executable test = () -> assertThat(testObject, doesNotHaveNullOrEmptyFields());
-        AssertionError error = assertThrows(AssertionError.class, test);
-        assertThat(error.getMessage(),containsString(fieldName));
+        assertErrorMessageContainsField(testObject, "StringField");
     }
 
     @ParameterizedTest
@@ -70,8 +64,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject,"CollectionField");
-
+        assertErrorMessageContainsField(testObject, "CollectionField");
     }
 
     @ParameterizedTest
@@ -85,9 +78,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject,"MapField");
-
-
+        assertErrorMessageContainsField(testObject, "MapField");
     }
 
     @Test
@@ -100,7 +91,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject,"BoxedField");
+        assertErrorMessageContainsField(testObject, "BoxedField");
     }
 
     @Test
@@ -113,7 +104,13 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(null)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject,"ClassObject");
+        assertErrorMessageContainsField(testObject, "ClassObject");
+    }
+
+    private void assertErrorMessageContainsField(TestClass testObject, String fieldName) {
+        Executable test = () -> assertThat(testObject, doesNotHaveNullOrEmptyFields());
+        AssertionError error = assertThrows(AssertionError.class, test);
+        assertThat(error.getMessage(), containsString(fieldName));
     }
 
     private static class TestClass {
