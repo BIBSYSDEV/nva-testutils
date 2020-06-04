@@ -32,7 +32,6 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
 
     @Override
     public void describeTo(Description description) {
-
         description.appendText("All fields to be non empty");
     }
 
@@ -40,15 +39,13 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
     public void describeMismatch(Object item, Description description) {
         String emptyFieldNames = emptyFields
             .stream()
-            .map(res->res.methodName)
+            .map(res -> res.methodName)
             .collect(Collectors.joining(
                 FIELD_DELIMITER));
 
         description.appendText("The following fields were found empty:")
             .appendText(emptyFieldNames);
     }
-
-
 
     private boolean assertThatNoPublicFieldIsNull(Object insertedUser) {
         Method[] methods = insertedUser.getClass().getMethods();
@@ -58,7 +55,7 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
 
         List<MethodInvocationResult> emptyFields = getterInvocations.filter(this::isEmpty).collect(
             Collectors.toList());
-        this.emptyFields =emptyFields;
+        this.emptyFields = emptyFields;
         return emptyFields.isEmpty();
     }
 
@@ -105,11 +102,10 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
             } else if (mir.result instanceof Map<?, ?>) {
                 Map map = (Map) mir.result;
                 return map.isEmpty();
-            } else if(mir.result instanceof String){
-                String str = (String)mir.result;
+            } else if (mir.result instanceof String) {
+                String str = (String) mir.result;
                 return str.isBlank();
-            }
-            else {
+            } else {
                 return false;
             }
         }
