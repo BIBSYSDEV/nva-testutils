@@ -1,14 +1,16 @@
 package no.unit.nva.testutils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * @deprecated use {@link HandlerRequestBuilder}.
+ */
+@Deprecated
 public final class HandlerUtils {
 
     public static final String BODY_FIELD = "body";
@@ -56,15 +58,14 @@ public final class HandlerUtils {
                                                                     Map<String, String> pathParameters,
                                                                     Map<String, String> queryParameters)
         throws JsonProcessingException {
-        ObjectNode root = objectMapper.createObjectNode();
-        String requestObjString = objectMapper.writeValueAsString(requestObject);
-        root.put(BODY_FIELD, requestObjString);
-        JsonNode headersNode = objectMapper.convertValue(headers, JsonNode.class);
-        root.set(HEADERS_FIELD, headersNode);
-        JsonNode pathParamsNode = objectMapper.convertValue(pathParameters, JsonNode.class);
-        JsonNode queryParametersNode = objectMapper.convertValue(queryParameters, JsonNode.class);
-        root.set(PATH_PARAMETERS, pathParamsNode);
-        root.set(QUERY_PARAMETERS, queryParametersNode);
-        return objectMapper.writeValueAsString(root);
+        InputStream inputStream = new HandlerRequestBuilder<T>(objectMapper)
+            .withBody(requestObject)
+            .withHeaders(headers)
+            .withPathParameters(pathParameters)
+            .withQueryParameters(queryParameters)
+            // no support for requestContext, use HandlerRequestBuilder instead
+            .build();
+
+        return HandlerRequestBuilder.toString(inputStream);
     }
 }
