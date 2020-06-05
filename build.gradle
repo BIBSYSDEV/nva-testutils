@@ -19,10 +19,11 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: jacksonVersion
+    implementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jupiterVersion
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+
 
 }
 
