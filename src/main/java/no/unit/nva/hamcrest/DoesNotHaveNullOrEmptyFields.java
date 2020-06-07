@@ -2,6 +2,9 @@ package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -15,11 +18,10 @@ import org.hamcrest.Description;
 
 public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
 
-    public static final String GETTER_GET_PREFIX = "get";
-    public static final String GETTER_IS_PREFIX = "is";
     public static final String FIELD_DELIMITER = ",";
+    public static final String PROPERTY_READ_ERRROR = "Could not read value for property:";
 
-    private List<MethodInvocationResult> emptyFields;
+    private List<PropertyValuePair> emptyFields;
 
     public static <R> DoesNotHaveNullOrEmptyFields<R> doesNotHaveNullOrEmptyFields() {
         return new DoesNotHaveNullOrEmptyFields<>();
@@ -37,9 +39,8 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
 
     @Override
     public void describeMismatch(Object item, Description description) {
-        String emptyFieldNames = emptyFields
-            .stream()
-            .map(res -> res.methodName)
+        String emptyFieldNames = emptyFields.stream()
+            .map(res -> res.propertyName)
             .collect(Collectors.joining(
                 FIELD_DELIMITER));
 
@@ -47,63 +48,62 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
             .appendText(emptyFieldNames);
     }
 
-    private boolean assertThatNoPublicFieldIsNull(Object insertedUser) {
-        Method[] methods = insertedUser.getClass().getMethods();
-        Stream<MethodInvocationResult> getterInvocations = Arrays.stream(methods)
-            .filter(this::isAGetter)
-            .map((method -> invokeMethodWithRuntimeException(insertedUser, method)));
-
-        List<MethodInvocationResult> emptyFields = getterInvocations.filter(this::isEmpty).collect(
-            Collectors.toList());
-        this.emptyFields = emptyFields;
+    private boolean assertThatNoPublicFieldIsNull(Object input) {
+        Stream<PropertyDescriptor> properties = retrieveProperties(input);
+        emptyFields = properties
+            .map(prop -> readPropertyValue(prop, input))
+            .filter(this::isEmpty)
+            .collect(Collectors.toList());
         return emptyFields.isEmpty();
     }
 
-    private MethodInvocationResult invokeMethodWithRuntimeException(Object insertedUser, Method method) {
+    private PropertyValuePair readPropertyValue(PropertyDescriptor prop, Object input) {
         try {
-            return invokeMethod(insertedUser, method);
+            Method getter = prop.getReadMethod();
+            Object propertyValue = getter.invoke(input);
+            return new PropertyValuePair(prop.getName(), propertyValue);
         } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(PROPERTY_READ_ERRROR + prop.getName());
+        }
+    }
+
+    private Stream<PropertyDescriptor> retrieveProperties(Object input) {
+        try {
+            return Arrays.stream(Introspector
+                .getBeanInfo(input.getClass(), Object.class)
+                .getPropertyDescriptors());
+        } catch (IntrospectionException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private MethodInvocationResult invokeMethod(Object insertedUser, Method method)
-        throws IllegalAccessException, InvocationTargetException {
-        Object result = method.invoke(insertedUser);
-        return new MethodInvocationResult(method.getName(), result);
-    }
+    private static class PropertyValuePair {
 
-    private boolean isAGetter(Method m) {
-        return m.getName().startsWith(GETTER_GET_PREFIX) || m.getName().startsWith(GETTER_IS_PREFIX);
-    }
+        public final String propertyName;
+        public final Object value;
 
-    private static class MethodInvocationResult {
-
-        public final String methodName;
-        public final Object result;
-
-        public MethodInvocationResult(String methodName, Object result) {
-            this.methodName = methodName;
-            this.result = result;
+        public PropertyValuePair(String propertyName, Object value) {
+            this.propertyName = propertyName;
+            this.value = value;
         }
 
         public String toString() {
-            return this.methodName;
+            return this.propertyName;
         }
     }
 
-    private boolean isEmpty(MethodInvocationResult mir) {
-        if (isNull(mir.result)) {
+    private boolean isEmpty(PropertyValuePair mir) {
+        if (isNull(mir.value)) {
             return true;
         } else {
-            if (mir.result instanceof Collection<?>) {
-                Collection col = (Collection) mir.result;
+            if (mir.value instanceof Collection<?>) {
+                Collection col = (Collection) mir.value;
                 return col.isEmpty();
-            } else if (mir.result instanceof Map<?, ?>) {
-                Map map = (Map) mir.result;
+            } else if (mir.value instanceof Map<?, ?>) {
+                Map map = (Map) mir.value;
                 return map.isEmpty();
-            } else if (mir.result instanceof String) {
-                String str = (String) mir.result;
+            } else if (mir.value instanceof String) {
+                String str = (String) mir.value;
                 return str.isBlank();
             } else {
                 return false;

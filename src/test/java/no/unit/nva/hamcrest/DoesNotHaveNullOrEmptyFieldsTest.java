@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,9 +23,18 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
     public static final Map<String, String> NON_EMPTY_MAP = Collections.singletonMap(SOME_STRING_VALUE,
         SOME_STRING_VALUE);
     public static final List<String> NON_EMPTY_COLLECTION = Collections.singletonList(SOME_STRING_VALUE);
-
-    private static final DoesNotHaveNullOrEmptyFields<TestClass> matcher = new DoesNotHaveNullOrEmptyFields<>();
     private static final TestClass SOME_OBJECT = new TestClass();
+
+    private DoesNotHaveNullOrEmptyFields<TestClass> matcher;
+
+    /**
+     * Initialize.
+     */
+    @BeforeEach
+    public void init() {
+        matcher = new DoesNotHaveNullOrEmptyFields<>();
+    }
+
 
     @Test
     public void matchesReturnsTrueWhenAllFieldsAreNotEmpty() {
@@ -50,7 +60,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject, "StringField");
+        assertErrorMessageContainsField(testObject, "stringField");
     }
 
     @ParameterizedTest
@@ -64,7 +74,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject, "CollectionField");
+        assertErrorMessageContainsField(testObject, "collectionField");
     }
 
     @ParameterizedTest
@@ -78,7 +88,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject, "MapField");
+        assertErrorMessageContainsField(testObject, "mapField");
     }
 
     @Test
@@ -91,7 +101,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(SOME_OBJECT)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject, "BoxedField");
+        assertErrorMessageContainsField(testObject, "boxedField");
     }
 
     @Test
@@ -104,7 +114,7 @@ public class DoesNotHaveNullOrEmptyFieldsTest {
             .withClassObject(null)
             .build();
         assertFalse(matcher.matches(testObject));
-        assertErrorMessageContainsField(testObject, "ClassObject");
+        assertErrorMessageContainsField(testObject, "classObject");
     }
 
     private void assertErrorMessageContainsField(TestClass testObject, String fieldName) {
