@@ -24,7 +24,7 @@ public class HttpRequestUtils {
     }
 
     @SuppressWarnings("unchecked")
-    protected HttpResponse<String> mockResponse(String body, HttpHeaders headers) {
+    private HttpResponse<String> mockResponse(String body, HttpHeaders headers) {
         HttpResponse<String> response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(HttpStatus.SC_OK);
         when(response.body()).thenReturn(body);
