@@ -12,10 +12,9 @@ public class ExceptionUtilsTest {
     public static final String NESTED_MESSAGE = "Nested message";
 
     @Test
-    public void stackTraceReturnsStackTraceStringOfException() {
-
+    void stackTraceReturnsStackTraceStringOfException() {
         Exception actual = assertThrows(Exception.class, this::throwsException);
-        String actualStackTrace = ExceptionUtils.stackTrace(actual);
+        String actualStackTrace = ExceptionUtils.stackTraceToString(actual);
         assertThat(actualStackTrace, containsString(TOP_MESSAGE));
         assertThat(actualStackTrace, containsString(NESTED_MESSAGE));
     }
