@@ -23,6 +23,8 @@ public class HandlerRequestBuilder<T> {
     private Map<String, String> pathParameters;
     @JsonProperty("requestContext")
     private Map<String, Object> requestContext;
+    @JsonProperty("method")
+    private String method;
 
     public static final String DELIMITER = "\n";
     private final transient ObjectMapper objectMapper;
@@ -57,6 +59,11 @@ public class HandlerRequestBuilder<T> {
 
     public HandlerRequestBuilder<T> withRequestContext(Map<String, Object> requestContext) {
         this.requestContext = requestContext;
+        return this;
+    }
+
+    public HandlerRequestBuilder<T> withMethod(String method){
+        this.method=method;
         return this;
     }
 
