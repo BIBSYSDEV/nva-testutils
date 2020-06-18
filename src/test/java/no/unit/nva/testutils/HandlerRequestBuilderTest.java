@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +21,8 @@ public class HandlerRequestBuilderTest {
     public static final String PATH_PARAMETERS = "pathParameters";
     public static final String QUERY_PARAMETERS = "queryStringParameters";
     public static final String REQUEST_CONTEXT = "requestContext";
+    public static final String SOME_METHOD = "POST";
+    private static final String METHOD = "method";
 
     // Can not use ObjectMapper from nva-commons because it would create a circular dependency
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -92,6 +95,17 @@ public class HandlerRequestBuilderTest {
 
         Map mapWithRequestContext = toMap(request);
         assertThat(mapWithRequestContext.get(REQUEST_CONTEXT), notNullValue());
+    }
+
+
+    @Test
+    public void buildReturnsRequestWithMethodWhenWithMethod() throws Exception {
+        InputStream request = new HandlerRequestBuilder<String>(objectMapper)
+            .withMethod(SOME_METHOD)
+            .build();
+
+        Map mapWithMethod = toMap(request);
+        assertThat(mapWithMethod.get(METHOD).toString(), is(equalTo(SOME_METHOD)));
     }
 
     private Map<String,Object> toMap(InputStream inputStream) throws JsonProcessingException {
