@@ -34,7 +34,6 @@ public class HandlerRequestBuilderTest {
 
         Map mapWithNullBody = toMap(request);
         assertThat(mapWithNullBody.get(BODY), nullValue());
-
     }
 
     @Test
@@ -58,7 +57,7 @@ public class HandlerRequestBuilderTest {
     }
 
     @Test
-    public void buildReturnsRequestWithHeadersWhenWithHeaders() throws  Exception {
+    public void buildReturnsRequestWithHeadersWhenWithHeaders() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
             .withHeaders(Map.of(KEY, VALUE))
             .build();
@@ -68,7 +67,7 @@ public class HandlerRequestBuilderTest {
     }
 
     @Test
-    public void buildReturnsRequestWithQueryParametersWhenWithQueryParameters() throws  Exception {
+    public void buildReturnsRequestWithQueryParametersWhenWithQueryParameters() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
             .withQueryParameters(Map.of(KEY, VALUE))
             .build();
@@ -78,7 +77,7 @@ public class HandlerRequestBuilderTest {
     }
 
     @Test
-    public void buildReturnsRequestWithPathParametersWhenWithPathParameters() throws  Exception {
+    public void buildReturnsRequestWithPathParametersWhenWithPathParameters() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
             .withPathParameters(Map.of(KEY, VALUE))
             .build();
@@ -97,7 +96,6 @@ public class HandlerRequestBuilderTest {
         assertThat(mapWithRequestContext.get(REQUEST_CONTEXT), notNullValue());
     }
 
-
     @Test
     public void buildReturnsRequestWithMethodWhenWithMethod() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
@@ -108,8 +106,7 @@ public class HandlerRequestBuilderTest {
         assertThat(mapWithMethod.get(METHOD).toString(), is(equalTo(SOME_METHOD)));
     }
 
-    private Map<String,Object> toMap(InputStream inputStream) throws JsonProcessingException {
+    private Map<String, Object> toMap(InputStream inputStream) throws JsonProcessingException {
         return objectMapper.readValue(HandlerRequestBuilder.toString(inputStream), Map.class);
     }
-
 }

@@ -35,7 +35,7 @@ public class HandlerRequestBuilder<T> {
 
     public HandlerRequestBuilder<T> withBody(T body) throws JsonProcessingException {
         if (body instanceof String) {
-            this.body = (String)body;
+            this.body = (String) body;
         } else {
             this.body = objectMapper.writeValueAsString(body);
         }
@@ -44,7 +44,7 @@ public class HandlerRequestBuilder<T> {
 
     public HandlerRequestBuilder<T> withHeaders(Map<String, String> headers) {
         this.headers = headers;
-        return  this;
+        return this;
     }
 
     public HandlerRequestBuilder<T> withQueryParameters(Map<String, String> queryParameters) {
@@ -62,8 +62,8 @@ public class HandlerRequestBuilder<T> {
         return this;
     }
 
-    public HandlerRequestBuilder<T> withMethod(String method){
-        this.method=method;
+    public HandlerRequestBuilder<T> withMethod(String method) {
+        this.method = method;
         return this;
     }
 
