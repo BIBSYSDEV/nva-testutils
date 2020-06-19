@@ -22,7 +22,7 @@ public class HandlerRequestBuilderTest {
     public static final String QUERY_PARAMETERS = "queryStringParameters";
     public static final String REQUEST_CONTEXT = "requestContext";
     public static final String SOME_METHOD = "POST";
-    private static final String METHOD = "method";
+    private static final String METHOD = "httpMethod";
 
     // Can not use ObjectMapper from nva-commons because it would create a circular dependency
     private ObjectMapper objectMapper = new ObjectMapper();
