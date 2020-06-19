@@ -23,7 +23,7 @@ public class HandlerRequestBuilderTest {
     public static final String QUERY_PARAMETERS = "queryStringParameters";
     public static final String REQUEST_CONTEXT = "requestContext";
     public static final String SOME_METHOD = "POST";
-    private static final String METHOD = "method";
+    private static final String HTTP_METHOD = "httpMethod";
 
     // Can not use ObjectMapper from nva-commons because it would create a circular dependency
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -100,11 +100,11 @@ public class HandlerRequestBuilderTest {
     @Test
     public void buildReturnsRequestWithMethodWhenWithMethod() throws Exception {
         InputStream request = new HandlerRequestBuilder<String>(objectMapper)
-            .withMethod(SOME_METHOD)
+            .withHttpMethod(SOME_METHOD)
             .build();
 
         Map<String, Object> mapWithMethod = toMap(request);
-        assertThat(mapWithMethod.get(METHOD).toString(), is(equalTo(SOME_METHOD)));
+        assertThat(mapWithMethod.get(HTTP_METHOD).toString(), is(equalTo(SOME_METHOD)));
     }
 
     private Map<String, Object> toMap(InputStream inputStream) throws JsonProcessingException {
