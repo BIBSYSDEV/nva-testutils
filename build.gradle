@@ -2,6 +2,10 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'pmd'
+    id "nebula.lint" version "16.9.0"
 }
 
 repositories {
@@ -31,3 +35,64 @@ test {
     // Use junit platform for unit tests
     useJUnitPlatform()
 }
+
+test {
+    useJUnitPlatform()
+    failFast = true
+    testLogging {
+        events('skipped', 'passed', 'failed')
+    }
+    Map<String, String> envVariables = new HashMap<>()
+    envVariables.put("ALLOWED_ORIGIN", "*")
+    environment(envVariables)
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+pmd {
+    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = true
+}
+
+checkstyle {
+    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+    showViolations = true
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+    }
+}
+
+// jacoco configuration
+check.dependsOn jacocoTestCoverageVerification
+jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
+        }
+        rule {
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
+        }
+    }
+}
+
