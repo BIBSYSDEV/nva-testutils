@@ -7,6 +7,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
@@ -38,11 +39,10 @@ class HandlerUtilsTest {
         assertNotNull(requestString);
         RequestBody actual = extractBodyFromSerializedRequest(requestString);
         JsonNode json = OBJECT_MAPPER.readTree(requestString);
-        Map<String, String> headers = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.HEADERS_FIELD), Map.class);
-        Map<String, String> pathParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.PATH_PARAMETERS),
-            Map.class);
-        Map<String, String> queryParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.QUERY_PARAMETERS),
-            Map.class);
+        TypeReference<Map<String, String>> type = new TypeReference<>() {};
+        Map<String, String> headers = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.HEADERS_FIELD), type);
+        Map<String, String> pathParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.PATH_PARAMETERS), type);
+        Map<String, String> queryParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.QUERY_PARAMETERS), type);
 
         assertThat(actual.getMyField(), is(equalTo(VALUE)));
         assertThat(headers, hasEntry(SOME_KEY, SOME_HEADER_VALUE));

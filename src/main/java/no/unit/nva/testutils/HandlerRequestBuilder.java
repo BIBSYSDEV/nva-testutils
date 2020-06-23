@@ -23,6 +23,8 @@ public class HandlerRequestBuilder<T> {
     private Map<String, String> pathParameters;
     @JsonProperty("requestContext")
     private Map<String, Object> requestContext;
+    @JsonProperty("httpMethod")
+    private String httpMethod;
 
     public static final String DELIMITER = "\n";
     private final transient ObjectMapper objectMapper;
@@ -33,7 +35,7 @@ public class HandlerRequestBuilder<T> {
 
     public HandlerRequestBuilder<T> withBody(T body) throws JsonProcessingException {
         if (body instanceof String) {
-            this.body = (String)body;
+            this.body = (String) body;
         } else {
             this.body = objectMapper.writeValueAsString(body);
         }
@@ -42,7 +44,7 @@ public class HandlerRequestBuilder<T> {
 
     public HandlerRequestBuilder<T> withHeaders(Map<String, String> headers) {
         this.headers = headers;
-        return  this;
+        return this;
     }
 
     public HandlerRequestBuilder<T> withQueryParameters(Map<String, String> queryParameters) {
@@ -57,6 +59,11 @@ public class HandlerRequestBuilder<T> {
 
     public HandlerRequestBuilder<T> withRequestContext(Map<String, Object> requestContext) {
         this.requestContext = requestContext;
+        return this;
+    }
+
+    public HandlerRequestBuilder<T> withHttpMethod(String httpMethod) {
+        this.httpMethod = httpMethod;
         return this;
     }
 
