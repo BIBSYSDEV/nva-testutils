@@ -2,6 +2,7 @@ package no.unit.nva.testutils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -75,5 +76,29 @@ public class HandlerRequestBuilder<T> {
         return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
             .lines()
             .collect(Collectors.joining(DELIMITER));
+    }
+
+    public T getBody(TypeReference<T> typeRef) throws JsonProcessingException {
+        return objectMapper.readValue(body,typeRef);
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public Map<String, String> getQueryParameters() {
+        return queryParameters;
+    }
+
+    public Map<String, String> getPathParameters() {
+        return pathParameters;
+    }
+
+    public Map<String, Object> getRequestContext() {
+        return requestContext;
+    }
+
+    public String getHttpMethod() {
+        return httpMethod;
     }
 }
