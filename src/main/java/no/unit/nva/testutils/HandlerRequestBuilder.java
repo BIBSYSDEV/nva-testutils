@@ -1,5 +1,7 @@
 package no.unit.nva.testutils;
 
+import static java.util.Objects.nonNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -79,7 +81,10 @@ public class HandlerRequestBuilder<T> {
     }
 
     public T getBody(TypeReference<T> typeRef) throws JsonProcessingException {
-        return objectMapper.readValue(body,typeRef);
+        if(nonNull(body)){
+            return objectMapper.readValue(body,typeRef);
+        }
+        return null;
     }
 
     public Map<String, String> getHeaders() {
