@@ -2,6 +2,8 @@ package no.unit.nva.testutils;
 
 import static java.util.Objects.nonNull;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -11,11 +13,14 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HandlerRequestBuilder<T> {
 
+    public static final String DELIMITER = "\n";
+    private final transient ObjectMapper objectMapper;
     @JsonProperty("body")
     private String body;
     @JsonProperty("headers")
@@ -28,12 +33,18 @@ public class HandlerRequestBuilder<T> {
     private Map<String, Object> requestContext;
     @JsonProperty("httpMethod")
     private String httpMethod;
-
-    public static final String DELIMITER = "\n";
-    private final transient ObjectMapper objectMapper;
+    @JsonAnySetter
+    private Map<String, Object> otherProperties;
 
     public HandlerRequestBuilder(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        this.otherProperties = new LinkedHashMap<>();
+    }
+
+    public static String toString(InputStream inputStream) {
+        return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+            .lines()
+            .collect(Collectors.joining(DELIMITER));
     }
 
     public HandlerRequestBuilder<T> withBody(T body) throws JsonProcessingException {
@@ -70,19 +81,18 @@ public class HandlerRequestBuilder<T> {
         return this;
     }
 
+    public HandlerRequestBuilder<T> withOtherProperties(Map<String, Object> otherProperties) {
+        this.otherProperties.putAll(otherProperties);
+        return this;
+    }
+
     public InputStream build() throws JsonProcessingException {
         return new ByteArrayInputStream(objectMapper.writeValueAsBytes(this));
     }
 
-    public static String toString(InputStream inputStream) {
-        return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-            .lines()
-            .collect(Collectors.joining(DELIMITER));
-    }
-
     public T getBody(TypeReference<T> typeRef) throws JsonProcessingException {
-        if(nonNull(body)){
-            return objectMapper.readValue(body,typeRef);
+        if (nonNull(body)) {
+            return objectMapper.readValue(body, typeRef);
         }
         return null;
     }
@@ -105,5 +115,14 @@ public class HandlerRequestBuilder<T> {
 
     public String getHttpMethod() {
         return httpMethod;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getOtherProperties() {
+        return otherProperties;
+    }
+
+    public void setOtherProperties(Map<String, Object> otherProperties) {
+        this.otherProperties = otherProperties;
     }
 }
