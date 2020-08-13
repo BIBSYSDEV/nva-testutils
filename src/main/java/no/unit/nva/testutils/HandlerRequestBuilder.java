@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class HandlerRequestBuilder<T> {
 
-    public static final String DELIMITER = "\n";
+    public static final String DELIMITER = System.lineSeparator();
     private final transient ObjectMapper objectMapper;
     @JsonProperty("body")
     private String body;
