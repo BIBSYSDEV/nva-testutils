@@ -2,6 +2,7 @@ package no.unit.nva.testutils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -9,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -105,6 +107,19 @@ public class HandlerRequestBuilderTest {
 
         Map<String, Object> mapWithMethod = toMap(request);
         assertThat(mapWithMethod.get(HTTP_METHOD).toString(), is(equalTo(SOME_METHOD)));
+    }
+
+    @Test
+    public void buildReturnsCustomPropertiesSetInRequest() throws IOException {
+        String expectedKey = "someKey";
+        String expectedValue = "someValue";
+        InputStream request = new HandlerRequestBuilder<String>(objectMapper)
+            .withOtherProperties(Map.of(expectedKey, expectedValue))
+            .build();
+
+        Map<String, Object> mapWithCustomField = toMap(request);
+
+        assertThat(mapWithCustomField, hasEntry(expectedKey, expectedValue));
     }
 
     private Map<String, Object> toMap(InputStream inputStream) throws JsonProcessingException {
