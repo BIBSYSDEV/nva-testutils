@@ -1,5 +1,6 @@
 package no.unit.nva.testutils;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -7,7 +8,10 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -15,11 +19,19 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class HandlerRequestBuilder<T> {
 
+
+
     public static final String DELIMITER = System.lineSeparator();
+    public static final String AUTHORIZER_NODE = "authorizer";
+    public static final String CLAIMS_NODE = "claims";
+    public static final String FEIDE_ID_CLAIM = "custom:feideId";
+    public static final String CUSTOMER_ID_CLAIM = "custom:customerId";
+    public static final String APPLICATION_ROLES_CLAIM = "custom:applicationRoles";
     private final transient ObjectMapper objectMapper;
     @JsonProperty("body")
     private String body;
@@ -30,7 +42,7 @@ public class HandlerRequestBuilder<T> {
     @JsonProperty("pathParameters")
     private Map<String, String> pathParameters;
     @JsonProperty("requestContext")
-    private Map<String, Object> requestContext;
+    private ObjectNode requestContext;
     @JsonProperty("httpMethod")
     private String httpMethod;
     @JsonAnySetter
@@ -71,8 +83,20 @@ public class HandlerRequestBuilder<T> {
         return this;
     }
 
-    public HandlerRequestBuilder<T> withRequestContext(Map<String, Object> requestContext) {
+    public HandlerRequestBuilder<T> withRequestContext(ObjectNode requestContext) {
         this.requestContext = requestContext;
+        return this;
+    }
+
+    /**
+     * Use the method that accepts an {@link ObjectNode} as a parameter.
+     *
+     * @param requestContext the requestContext object.
+     * @return the builder.
+     */
+    @Deprecated
+    public HandlerRequestBuilder<T> withRequestContext(Map<String, Object> requestContext) {
+        this.requestContext = objectMapper.convertValue(requestContext, ObjectNode.class);
         return this;
     }
 
@@ -110,7 +134,8 @@ public class HandlerRequestBuilder<T> {
     }
 
     public Map<String, Object> getRequestContext() {
-        return requestContext;
+        JavaType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
+        return objectMapper.convertValue(requestContext, mapType);
     }
 
     public String getHttpMethod() {
@@ -124,5 +149,51 @@ public class HandlerRequestBuilder<T> {
 
     public void setOtherProperties(Map<String, Object> otherProperties) {
         this.otherProperties = otherProperties;
+    }
+
+    public HandlerRequestBuilder<T> withFeideId(String feideId) {
+        ObjectNode claims = getOrCreateClaimsNode();
+        claims.put(FEIDE_ID_CLAIM, feideId);
+        return this;
+    }
+
+    public HandlerRequestBuilder<T> withCustomerId(String customerId) {
+        ObjectNode claims = getOrCreateClaimsNode();
+        claims.put(CUSTOMER_ID_CLAIM, customerId);
+        return this;
+    }
+
+    public HandlerRequestBuilder<T> withRoles(String roles) {
+        ObjectNode claims = getOrCreateClaimsNode();
+        claims.put(APPLICATION_ROLES_CLAIM, roles);
+        return this;
+    }
+
+    private ObjectNode getOrCreateClaimsNode() {
+        ObjectNode authenticationNode = getOrCreateAuthorizerNode();
+        ObjectNode claimsNode = createChildNode(authenticationNode, CLAIMS_NODE);
+        authenticationNode.set(CLAIMS_NODE, claimsNode);
+        return claimsNode;
+    }
+
+    private ObjectNode createChildNode(ObjectNode parentNode, String childNodeName) {
+        return Optional.ofNullable(parentNode)
+            .map(parent -> parent.get(childNodeName))
+            .filter(JsonNode::isObject)
+            .map(node -> (ObjectNode) node)
+            .orElse(objectMapper.createObjectNode());
+    }
+
+    private void initializeRequestContextIfNotExists() {
+         if(isNull(requestContext)){
+             requestContext= objectMapper.createObjectNode();
+         }
+    }
+
+    private ObjectNode getOrCreateAuthorizerNode() {
+        initializeRequestContextIfNotExists();
+        ObjectNode authorizerNode = createChildNode(requestContext, AUTHORIZER_NODE);
+        requestContext.set(AUTHORIZER_NODE, authorizerNode);
+        return authorizerNode;
     }
 }
