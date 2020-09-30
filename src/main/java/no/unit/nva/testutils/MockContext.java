@@ -14,7 +14,6 @@ public class MockContext implements Context {
 
     }
 
-
     @Override
     public String getAwsRequestId() {
         return awsRequestId;
@@ -22,51 +21,51 @@ public class MockContext implements Context {
 
     @Override
     public String getLogGroupName() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getLogStreamName() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getFunctionName() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getFunctionVersion() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getInvokedFunctionArn() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CognitoIdentity getIdentity() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ClientContext getClientContext() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getRemainingTimeInMillis() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getMemoryLimitInMB() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public LambdaLogger getLogger() {
-        throw  new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 }
