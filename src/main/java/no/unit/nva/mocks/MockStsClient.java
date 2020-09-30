@@ -31,9 +31,9 @@ import java.util.Date;
 
 public class MockStsClient implements AWSSecurityTokenService {
 
-    public static final String SAMPLE_ACCESS_KEY_ID = "accessKeyId";
-    public static final String SAMPLE_ACCESS_KEY = "accessKey";
-    public static final String SAMPLE_SESSION_TOKEN = "sessionToken";
+    public static final String SAMPLE_ACCESS_KEY_ID = "sampleAccessKeyid";
+    public static final String SAMPLE_ACCESS_KEY = "sampleAccessKey";
+    public static final String SAMPLE_SESSION_TOKEN = "sampleSessionToken";
     private final AWSSecurityTokenService sts;
 
     public MockStsClient() {
