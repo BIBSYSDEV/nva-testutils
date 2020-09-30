@@ -10,10 +10,6 @@ public class MockContext implements Context {
 
     private final String awsRequestId = UUID.randomUUID().toString();
 
-    public MockContext() {
-
-    }
-
     @Override
     public String getAwsRequestId() {
         return awsRequestId;
