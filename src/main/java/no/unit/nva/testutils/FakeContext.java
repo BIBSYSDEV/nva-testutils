@@ -6,7 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import java.util.UUID;
 
-public class MockContext implements Context {
+public class FakeContext implements Context {
 
     private final String awsRequestId = UUID.randomUUID().toString();
 
