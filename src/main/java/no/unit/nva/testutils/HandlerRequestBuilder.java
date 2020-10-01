@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 
 public class HandlerRequestBuilder<T> {
 
-
-
     public static final String DELIMITER = System.lineSeparator();
     public static final String AUTHORIZER_NODE = "authorizer";
     public static final String CLAIMS_NODE = "claims";
@@ -185,9 +183,9 @@ public class HandlerRequestBuilder<T> {
     }
 
     private void initializeRequestContextIfNotExists() {
-         if(isNull(requestContext)){
-             requestContext= objectMapper.createObjectNode();
-         }
+        if (isNull(requestContext)) {
+            requestContext = objectMapper.createObjectNode();
+        }
     }
 
     private ObjectNode getOrCreateAuthorizerNode() {

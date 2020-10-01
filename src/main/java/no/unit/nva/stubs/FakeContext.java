@@ -1,4 +1,4 @@
-package no.unit.nva.testutils;
+package no.unit.nva.stubs;
 
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;

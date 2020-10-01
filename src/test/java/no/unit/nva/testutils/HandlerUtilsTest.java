@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Test;
 
 class HandlerUtilsTest {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final String VALUE = "value";
     public static final String SOME_KEY = "SomeKey";
     public static final String SOME_HEADER_VALUE = "SomeHeaderValue";
     public static final String SOME_QUERY_VALUE = "SomeQueryValue";
     public static final String SOME_PATH_VALUE = "SomePathValue";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Test
     public void requestObjectToApiGatewayRequestStringReturnsValidJsonObjectForNullHeaders()
