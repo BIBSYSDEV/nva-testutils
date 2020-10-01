@@ -1,6 +1,7 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'jacoco'
     id 'checkstyle'
     id 'pmd'
     id "nebula.lint" version "16.9.0"
@@ -46,8 +47,14 @@ test {
     Map<String, String> envVariables = new HashMap<>()
     envVariables.put("ALLOWED_ORIGIN", "*")
     environment(envVariables)
+    finalizedBy jacocoTestReport
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
 
 pmd {
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
@@ -65,6 +72,29 @@ tasks.withType(Checkstyle) {
         xml.enabled false
         html.enabled true
         html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+    }
+}
+
+// jacoco configuration
+check.dependsOn jacocoTestCoverageVerification
+jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+        }
+        rule {
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+        }
     }
 }
 
