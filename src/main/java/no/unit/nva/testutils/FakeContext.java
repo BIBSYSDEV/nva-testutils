@@ -1,80 +1,67 @@
 package no.unit.nva.testutils;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import java.util.UUID;
 
-public class MockContext implements Context {
+public class FakeContext implements Context {
 
-    private final Context context;
     private final String awsRequestId = UUID.randomUUID().toString();
-
-    public MockContext() {
-        this.context = mock(Context.class);
-        when(context.getAwsRequestId()).thenReturn(awsRequestId);
-    }
-
-    public MockContext(Context context) {
-        this.context = context;
-    }
 
     @Override
     public String getAwsRequestId() {
-        return context.getAwsRequestId();
+        return awsRequestId;
     }
 
     @Override
     public String getLogGroupName() {
-        return context.getLogGroupName();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getLogStreamName() {
-        return context.getLogStreamName();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getFunctionName() {
-        return context.getFunctionName();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getFunctionVersion() {
-        return context.getFunctionVersion();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getInvokedFunctionArn() {
-        return context.getInvokedFunctionArn();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CognitoIdentity getIdentity() {
-        return context.getIdentity();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ClientContext getClientContext() {
-        return context.getClientContext();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getRemainingTimeInMillis() {
-        return context.getRemainingTimeInMillis();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getMemoryLimitInMB() {
-        return context.getMemoryLimitInMB();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public LambdaLogger getLogger() {
-        return context.getLogger();
+        throw new UnsupportedOperationException();
     }
 }
