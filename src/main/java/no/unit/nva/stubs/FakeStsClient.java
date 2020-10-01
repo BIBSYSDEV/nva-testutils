@@ -34,6 +34,7 @@ public class FakeStsClient implements AWSSecurityTokenService {
     public static final String SAMPLE_ACCESS_KEY_ID = "sampleAccessKeyid";
     public static final String SAMPLE_ACCESS_KEY = "sampleAccessKey";
     public static final String SAMPLE_SESSION_TOKEN = "sampleSessionToken";
+    public static final String NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT = "Not implemented in MockStsClient";
     private final AWSSecurityTokenService sts;
 
     public FakeStsClient() {
@@ -51,64 +52,64 @@ public class FakeStsClient implements AWSSecurityTokenService {
 
     @Override
     public void setEndpoint(String endpoint) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public void setRegion(Region region) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public AssumeRoleWithSAMLResult assumeRoleWithSAML(AssumeRoleWithSAMLRequest assumeRoleWithSAMLRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public AssumeRoleWithWebIdentityResult assumeRoleWithWebIdentity(
         AssumeRoleWithWebIdentityRequest assumeRoleWithWebIdentityRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public DecodeAuthorizationMessageResult decodeAuthorizationMessage(
         DecodeAuthorizationMessageRequest decodeAuthorizationMessageRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public GetAccessKeyInfoResult getAccessKeyInfo(GetAccessKeyInfoRequest getAccessKeyInfoRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public GetCallerIdentityResult getCallerIdentity(GetCallerIdentityRequest getCallerIdentityRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public GetFederationTokenResult getFederationToken(GetFederationTokenRequest getFederationTokenRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public GetSessionTokenResult getSessionToken(GetSessionTokenRequest getSessionTokenRequest) {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public GetSessionTokenResult getSessionToken() {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public void shutdown() {
-        throw new UnsupportedOperationException("Not implemented in MockStsClient");
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     @Override
     public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest request) {
-        return null;
+        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
 
     private AWSSecurityTokenService fakeStsService() {
