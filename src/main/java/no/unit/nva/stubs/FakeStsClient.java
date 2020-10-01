@@ -1,4 +1,4 @@
-package no.unit.nva.mocks;
+package no.unit.nva.stubs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,18 +29,18 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
-public class MockStsClient implements AWSSecurityTokenService {
+public class FakeStsClient implements AWSSecurityTokenService {
 
     public static final String SAMPLE_ACCESS_KEY_ID = "sampleAccessKeyid";
     public static final String SAMPLE_ACCESS_KEY = "sampleAccessKey";
     public static final String SAMPLE_SESSION_TOKEN = "sampleSessionToken";
     private final AWSSecurityTokenService sts;
 
-    public MockStsClient() {
-        sts = mockStsService();
+    public FakeStsClient() {
+        sts = fakeStsService();
     }
 
-    public MockStsClient(AWSSecurityTokenService sts) {
+    public FakeStsClient(AWSSecurityTokenService sts) {
         this.sts = sts;
     }
 
@@ -111,17 +111,17 @@ public class MockStsClient implements AWSSecurityTokenService {
         return null;
     }
 
-    private AWSSecurityTokenService mockStsService() {
+    private AWSSecurityTokenService fakeStsService() {
         AWSSecurityTokenService sts = mock(AWSSecurityTokenService.class);
-        when(sts.assumeRole(any(AssumeRoleRequest.class))).thenReturn(mockAssumeRole());
+        when(sts.assumeRole(any(AssumeRoleRequest.class))).thenReturn(fakeAssumedRole());
         return sts;
     }
 
-    private AssumeRoleResult mockAssumeRole() {
-        return new AssumeRoleResult().withCredentials(mockCredentials());
+    private AssumeRoleResult fakeAssumedRole() {
+        return new AssumeRoleResult().withCredentials(fakeCredentials());
     }
 
-    private Credentials mockCredentials() {
+    private Credentials fakeCredentials() {
         return new Credentials(SAMPLE_ACCESS_KEY_ID, SAMPLE_ACCESS_KEY, SAMPLE_SESSION_TOKEN,
             Date.from(Instant.now().plus(Duration.ofDays(10))));
     }
