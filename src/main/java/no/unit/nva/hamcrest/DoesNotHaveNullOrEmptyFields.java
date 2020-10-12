@@ -2,6 +2,7 @@ package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -77,22 +78,6 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
         }
     }
 
-    private static class PropertyValuePair {
-
-        public final String propertyName;
-        public final Object value;
-
-        public PropertyValuePair(String propertyName, Object value) {
-            this.propertyName = propertyName;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.propertyName;
-        }
-    }
-
     private boolean isEmpty(PropertyValuePair mir) {
         if (isNull(mir.value)) {
             return true;
@@ -106,9 +91,28 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
             } else if (mir.value instanceof String) {
                 String str = (String) mir.value;
                 return str.isBlank();
+            } else if (mir.value instanceof JsonNode) {
+                JsonNode node = (JsonNode) mir.value;
+                return node.isEmpty();
             } else {
                 return false;
             }
+        }
+    }
+
+    private static class PropertyValuePair {
+
+        public final String propertyName;
+        public final Object value;
+
+        public PropertyValuePair(String propertyName, Object value) {
+            this.propertyName = propertyName;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.propertyName;
         }
     }
 }
