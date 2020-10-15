@@ -78,21 +78,21 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
         }
     }
 
-    private boolean isEmpty(PropertyValuePair mir) {
-        if (isNull(mir.value)) {
+    private boolean isEmpty(PropertyValuePair propertyValuePair) {
+        if (isNull(propertyValuePair.value)) {
             return true;
         } else {
-            if (mir.value instanceof Collection<?>) {
-                Collection col = (Collection) mir.value;
+            if (propertyValuePair.value instanceof Collection<?>) {
+                Collection col = (Collection) propertyValuePair.value;
                 return col.isEmpty();
-            } else if (mir.value instanceof Map<?, ?>) {
-                Map map = (Map) mir.value;
+            } else if (propertyValuePair.value instanceof Map<?, ?>) {
+                Map map = (Map) propertyValuePair.value;
                 return map.isEmpty();
-            } else if (mir.value instanceof String) {
-                String str = (String) mir.value;
+            } else if (propertyValuePair.value instanceof String) {
+                String str = (String) propertyValuePair.value;
                 return str.isBlank();
-            } else if (mir.value instanceof JsonNode) {
-                JsonNode node = (JsonNode) mir.value;
+            } else if (propertyValuePair.value instanceof JsonNode) {
+                JsonNode node = (JsonNode) propertyValuePair.value;
                 return node.isEmpty();
             } else {
                 return false;
