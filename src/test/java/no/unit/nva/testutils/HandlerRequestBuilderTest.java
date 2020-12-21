@@ -3,9 +3,11 @@ package no.unit.nva.testutils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.StringContains.containsString;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +36,9 @@ public class HandlerRequestBuilderTest {
         "/requestContext/authorizer/claims/custom:customerId");
     public static final JsonPointer APPLICATION_ROLES =
         JsonPointer.compile("/requestContext/authorizer/claims/custom:applicationRoles");
+    public static final JsonPointer ACCESS_RIGHTS =
+        JsonPointer.compile("/requestContext/authorizer/claims/custom:accessRights");
+
     private static final String HTTP_METHOD = "httpMethod";
 
     // Can not use ObjectMapper from nva-commons because it would create a circular dependency
@@ -188,6 +193,21 @@ public class HandlerRequestBuilderTest {
         Map<String, Object> mapWithCustomField = toMap(request);
 
         assertThat(mapWithCustomField, hasEntry(expectedKey, expectedValue));
+    }
+
+    @Test
+    public void buildReturnsAccessRightsWhenAccessRightsHaveBeenSet() throws JsonProcessingException {
+        String accessRight1 = "AccessRight1";
+        String accessRight2 = "AccessRight2";
+        InputStream inputStream = new HandlerRequestBuilder<String>(objectMapper)
+            .withAccessRight(accessRight1)
+            .withAccessRight(accessRight2)
+            .build();
+        JsonNode requestJson = toJsonNode(inputStream);
+
+        String accessRights = requestJson.at(ACCESS_RIGHTS).textValue();
+        assertThat(accessRights, containsString(accessRight1));
+        assertThat(accessRights, containsString(accessRight2));
     }
 
     private Map<String, Object> toMap(InputStream inputStream) throws JsonProcessingException {

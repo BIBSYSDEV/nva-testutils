@@ -17,7 +17,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +33,9 @@ public class HandlerRequestBuilder<T> {
     public static final String FEIDE_ID_CLAIM = "custom:feideId";
     public static final String CUSTOMER_ID_CLAIM = "custom:customerId";
     public static final String APPLICATION_ROLES_CLAIM = "custom:applicationRoles";
+    public static final String ACCESS_RIGHTS_CLAIM = "custom:accessRights";
+    public static final String ACCESS_RIGHTS_SEPARATOR = ",";
+    public static final String EMPTY_STRING = "";
     private final transient ObjectMapper objectMapper;
     @JsonProperty("body")
     private String body;
@@ -165,6 +171,30 @@ public class HandlerRequestBuilder<T> {
         ObjectNode claims = getOrCreateClaimsNode();
         claims.put(APPLICATION_ROLES_CLAIM, roles);
         return this;
+    }
+
+    public HandlerRequestBuilder<T> withAccessRight(String accessRight) {
+        ObjectNode claims = getOrCreateClaimsNode();
+        String accessRights = Optional.ofNullable(claims.get(ACCESS_RIGHTS_CLAIM))
+            .map(JsonNode::textValue)
+            .orElse(EMPTY_STRING);
+        ArrayList<String> accessRightsList = toList(accessRights);
+        accessRightsList.add(accessRight);
+        String newAccessRights = toAccessRightsString(accessRightsList);
+        claims.put(ACCESS_RIGHTS_CLAIM, newAccessRights);
+        return this;
+    }
+
+    private String toAccessRightsString(List<String> accessRightsList) {
+        return String.join(ACCESS_RIGHTS_SEPARATOR, accessRightsList);
+    }
+
+    private ArrayList<String> toList(String accessRights) {
+        if (isNull(accessRights) || accessRights.isBlank()) {
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>(Arrays.asList(accessRights.split(ACCESS_RIGHTS_SEPARATOR)));
+        }
     }
 
     private ObjectNode getOrCreateClaimsNode() {
