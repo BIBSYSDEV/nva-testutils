@@ -35,11 +35,19 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
         this.emptyFields = new ArrayList<>();
     }
 
-    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValues() {
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses() {
         return new DoesNotHaveEmptyValues<>();
     }
 
-    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValues(List<Class<?>> ignoreList) {
+    /**
+     * Stop the nested check for the classes in the ignore list. The fields of the specified types will be checked
+     * whether they are null or not, but their fields will not be checked.
+     *
+     * @param ignoreList List of classes where the nested field check will stop.
+     * @param <R>        the type of the object in test.
+     * @return a matcher.
+     */
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(List<Class<?>> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
         ArrayList<Class<?>> newIgnoreList = new ArrayList<>();
         newIgnoreList.addAll(matcher.ignoreList);
