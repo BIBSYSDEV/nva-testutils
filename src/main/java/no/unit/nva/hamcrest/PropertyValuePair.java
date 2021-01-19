@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class PropertyValuePair {
 
-    public static final String ERROR_INVOKING_GETTER = "Could not get value for method: ";
+    public static final String ERROR_INVOKING_GETTER = "Could not get value for field: ";
     public static final String FIELD_PATH_DELIMITER = ".";
     public static final String ROOT_OBJECT_PATH = "";
     public static final String ARRAY_INDEX = ":";
@@ -140,7 +140,7 @@ public class PropertyValuePair {
                 this.fieldPath
             );
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(ERROR_INVOKING_GETTER + propertyDescriptor.getName(), e);
+            throw new RuntimeException(ERROR_INVOKING_GETTER + fieldPath, e);
         }
     }
 }
