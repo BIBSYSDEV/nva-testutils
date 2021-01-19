@@ -35,7 +35,7 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
         this.emptyFields = new ArrayList<>();
     }
 
-    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses() {
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValues() {
         return new DoesNotHaveEmptyValues<>();
     }
 

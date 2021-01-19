@@ -2,7 +2,6 @@ package no.unit.nva.hamcrest;
 
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.EMPTY_FIELD_ERROR;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.FIELD_PATH_DELIMITER;
-import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringClasses;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
@@ -61,7 +60,7 @@ public class DoesNotHaveEmptyValuesTest {
             SAMPLE_JSON_NODE);
 
         AssertionError exception = assertThrows(AssertionError.class,
-            () -> assertThat(withEmptyInt, doesNotHaveEmptyValuesIgnoringClasses()));
+            () -> assertThat(withEmptyInt, DoesNotHaveEmptyValues.doesNotHaveEmptyValues()));
         assertThat(exception.getMessage(), containsString(EMPTY_FIELD_ERROR));
         assertThat(exception.getMessage(), containsString("intField"));
     }
@@ -78,7 +77,7 @@ public class DoesNotHaveEmptyValuesTest {
         ClassWithChildrenWithMultipleFields testObject =
             new ClassWithChildrenWithMultipleFields(SAMPLE_STRING, objectMissingStringField(), SAMPLE_INT);
         AssertionError error = assertThrows(AssertionError.class,
-            () -> assertThat(testObject, doesNotHaveEmptyValuesIgnoringClasses()));
+            () -> assertThat(testObject, DoesNotHaveEmptyValues.doesNotHaveEmptyValues()));
         assertThat(error.getMessage(), containsString("objectWithFields" + FIELD_PATH_DELIMITER + "stringField"));
     }
 
