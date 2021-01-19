@@ -1,7 +1,6 @@
 package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -24,6 +23,12 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
 
     private List<PropertyValuePair> emptyFields;
 
+    /**
+     * use doesNotHaveEmptyValues instead.
+     * @param <R>
+     * @return
+     */
+    @Deprecated
     public static <R> DoesNotHaveNullOrEmptyFields<R> doesNotHaveNullOrEmptyFields() {
         return new DoesNotHaveNullOrEmptyFields<>();
     }

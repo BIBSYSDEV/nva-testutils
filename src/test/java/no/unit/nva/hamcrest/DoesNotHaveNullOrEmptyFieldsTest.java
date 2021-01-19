@@ -19,6 +19,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+
 public class DoesNotHaveNullOrEmptyFieldsTest {
 
     public static final int SOME_BOXED_VALUE = 5;
