@@ -135,7 +135,7 @@ public class DoesNotHaveEmptyValuesTest {
 
         ClassWithChildrenWithMultipleFields testObject =
             new ClassWithChildrenWithMultipleFields(SAMPLE_STRING, ignoredObjectWithEmptyProperties, SAMPLE_INT);
-        assertThat(testObject, doesNotHaveEmptyValuesIgnoringClasses(List.of(WithBaseTypes.class)));
+        assertThat(testObject, DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringClasses(List.of(WithBaseTypes.class)));
     }
 
     private static JsonNode nonEmptyJsonNode() {
