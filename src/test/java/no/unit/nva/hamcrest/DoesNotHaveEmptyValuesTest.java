@@ -34,7 +34,7 @@ public class DoesNotHaveEmptyValuesTest {
 
     @Test
     public void matchesReturnsTrueWhenObjectWithSimpleFieldsHasNoNullValue() {
-        WithPrimitiveFields nonEmptyObject = new WithPrimitiveFields(SAMPLE_STRING,
+        WithBaseTypes nonEmptyObject = new WithBaseTypes(SAMPLE_STRING,
             SAMPLE_INT,
             SAMPLE_LIST,
             SAMPLE_MAP,
@@ -44,7 +44,7 @@ public class DoesNotHaveEmptyValuesTest {
 
     @Test
     public void matchesReturnsFalseWhenStringIsEmpty() {
-        WithPrimitiveFields nonEmptyObject = new WithPrimitiveFields(EMPTY_STRING,
+        WithBaseTypes nonEmptyObject = new WithBaseTypes(EMPTY_STRING,
             SAMPLE_INT,
             SAMPLE_LIST,
             SAMPLE_MAP,
@@ -54,7 +54,7 @@ public class DoesNotHaveEmptyValuesTest {
 
     @Test
     public void matcherReturnsMessageContainingTheFieldNameWhenFieldIsEmpty() {
-        WithPrimitiveFields withEmptyInt = new WithPrimitiveFields(SAMPLE_STRING,
+        WithBaseTypes withEmptyInt = new WithBaseTypes(SAMPLE_STRING,
             null,
             SAMPLE_LIST,
             SAMPLE_MAP,
@@ -83,13 +83,43 @@ public class DoesNotHaveEmptyValuesTest {
     }
 
     @Test
-    public void matchesReturnsFalseWhenStringIsNull() {
-        WithPrimitiveFields nonEmptyObject = new WithPrimitiveFields(null,
+    public void matchesReturnsFalseWhenBaseTypeIsNull() {
+        WithBaseTypes baseTypesObject = new WithBaseTypes(null,
             SAMPLE_INT,
             SAMPLE_LIST,
             SAMPLE_MAP,
             SAMPLE_JSON_NODE);
-        assertThat(matcher.matches(nonEmptyObject), is(false));
+        assertThat(matcher.matches(baseTypesObject), is(false));
+    }
+
+    @Test
+    public void matchesReturnsFalseWhenListIsEmpty() {
+        WithBaseTypes baseTypesObject = new WithBaseTypes(SAMPLE_STRING,
+            SAMPLE_INT,
+            Collections.emptyList(),
+            SAMPLE_MAP,
+            SAMPLE_JSON_NODE);
+        assertThat(matcher.matches(baseTypesObject), is(false));
+    }
+
+    @Test
+    public void matchesReturnsFalseWhenMapIsEmpty() {
+        WithBaseTypes baseTypesObject = new WithBaseTypes(SAMPLE_STRING,
+            SAMPLE_INT,
+            SAMPLE_LIST,
+            Collections.emptyMap(),
+            SAMPLE_JSON_NODE);
+        assertThat(matcher.matches(baseTypesObject), is(false));
+    }
+
+    @Test
+    public void matchesReturnsFalseWhenJsonNodeIsEmpty() {
+        WithBaseTypes baseTypesObject = new WithBaseTypes(SAMPLE_STRING,
+            SAMPLE_INT,
+            SAMPLE_LIST,
+            SAMPLE_MAP,
+            new ObjectMapper().createObjectNode());
+        assertThat(matcher.matches(baseTypesObject), is(false));
     }
 
     @Test
@@ -98,17 +128,27 @@ public class DoesNotHaveEmptyValuesTest {
         assertThat(matcher.matches(withUri), is(true));
     }
 
+    @Test
+    public void matchesDoesNotCheckFieldInCustomlyAddedIngoreClass() {
+        WithBaseTypes ignoredObjectWithEmptyProperties =
+            new WithBaseTypes(null, null, null, null, null);
+
+        ClassWithChildrenWithMultipleFields testObject =
+            new ClassWithChildrenWithMultipleFields(SAMPLE_STRING, ignoredObjectWithEmptyProperties, SAMPLE_INT);
+        assertThat(testObject, doesNotHaveEmptyValues(List.of(WithBaseTypes.class)));
+    }
+
     private static JsonNode nonEmptyJsonNode() {
         ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("someKey", "someValue");
         return node;
     }
 
-    private WithPrimitiveFields objectMissingStringField() {
-        return new WithPrimitiveFields(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
+    private WithBaseTypes objectMissingStringField() {
+        return new WithBaseTypes(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
     }
 
-    private static class WithPrimitiveFields {
+    private static class WithBaseTypes {
 
         private final String stringField;
         private final Integer intField;
@@ -116,8 +156,8 @@ public class DoesNotHaveEmptyValuesTest {
         private final Map<String, String> map;
         private final JsonNode jsonNode;
 
-        public WithPrimitiveFields(String stringField, Integer intField, List<String> list,
-                                   Map<String, String> map, JsonNode jsonNode) {
+        public WithBaseTypes(String stringField, Integer intField, List<String> list,
+                             Map<String, String> map, JsonNode jsonNode) {
             this.stringField = stringField;
             this.intField = intField;
             this.list = list;
@@ -149,11 +189,11 @@ public class DoesNotHaveEmptyValuesTest {
     private static class ClassWithChildrenWithMultipleFields {
 
         private final String someStringField;
-        private final WithPrimitiveFields objectWithFields;
+        private final WithBaseTypes objectWithFields;
         private final Integer someIntField;
 
         public ClassWithChildrenWithMultipleFields(String someStringField,
-                                                   WithPrimitiveFields objectWithFields, Integer someIntField) {
+                                                   WithBaseTypes objectWithFields, Integer someIntField) {
             this.someStringField = someStringField;
             this.objectWithFields = objectWithFields;
             this.someIntField = someIntField;
@@ -163,7 +203,7 @@ public class DoesNotHaveEmptyValuesTest {
             return someStringField;
         }
 
-        public WithPrimitiveFields getObjectWithFields() {
+        public WithBaseTypes getObjectWithFields() {
             return objectWithFields;
         }
 

@@ -26,26 +26,26 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
     private final List<PropertyValuePair> emptyFields;
-    private final List<Class> ignoreList = List.of(
-        String.class,
-        Integer.class,
-        Double.class,
-        Float.class,
-        Boolean.class,
-        Map.class,
-        Collection.class,
-        JsonNode.class,
-        Class.class,
-        URI.class
-    );
+    private List<Class<?>> ignoreList;
 
     public DoesNotHaveEmptyValues() {
         super();
+        ignoreList = doNotCheckRecursively();
+
         this.emptyFields = new ArrayList<>();
     }
 
     public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValues() {
         return new DoesNotHaveEmptyValues<>();
+    }
+
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValues(List<Class<?>> ignoreList) {
+        DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
+        ArrayList<Class<?>> newIgnoreList = new ArrayList<>();
+        newIgnoreList.addAll(matcher.ignoreList);
+        newIgnoreList.addAll(ignoreList);
+        matcher.ignoreList = newIgnoreList;
+        return matcher;
     }
 
     @Override
@@ -78,6 +78,21 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
         description.appendText(EMPTY_FIELD_ERROR)
             .appendText(emptyFieldNames);
+    }
+
+    private List<Class<?>> doNotCheckRecursively() {
+        return List.of(
+            String.class,
+            Integer.class,
+            Double.class,
+            Float.class,
+            Boolean.class,
+            Map.class,
+            Collection.class,
+            JsonNode.class,
+            Class.class,
+            URI.class
+        );
     }
 
     private void checkRecursivelyForEmptyFields(String fieldPath, PropertyValuePair propValue) {
@@ -153,8 +168,6 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
             || isEmptyMap(value)
             || isEmptyJsonNode(value);
     }
-
-
 
     private boolean isEmptyMap(Object value) {
         if (value instanceof Map) {

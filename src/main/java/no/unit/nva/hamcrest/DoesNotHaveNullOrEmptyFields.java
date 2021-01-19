@@ -25,8 +25,9 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
 
     /**
      * use doesNotHaveEmptyValues instead.
-     * @param <R>
-     * @return
+     *
+     * @param <R> the type of the object
+     * @return a new matcher
      */
     @Deprecated
     public static <R> DoesNotHaveNullOrEmptyFields<R> doesNotHaveNullOrEmptyFields() {
