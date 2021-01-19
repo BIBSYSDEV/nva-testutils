@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -81,10 +82,6 @@ public class DoesNotHaveEmptyValuesTest {
         assertThat(error.getMessage(), containsString("objectWithFields" + FIELD_PATH_DELIMITER + "stringField"));
     }
 
-    private WithPrimitiveFields objectMissingStringField() {
-        return new WithPrimitiveFields(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
-    }
-
     @Test
     public void matchesReturnsFalseWhenStringIsNull() {
         WithPrimitiveFields nonEmptyObject = new WithPrimitiveFields(null,
@@ -95,10 +92,20 @@ public class DoesNotHaveEmptyValuesTest {
         assertThat(matcher.matches(nonEmptyObject), is(false));
     }
 
+    @Test
+    public void matchesDoesNotCheckFieldsInIgnoredList() {
+        ClassWithUri withUri = new ClassWithUri(URI.create("http://example.com"));
+        assertThat(matcher.matches(withUri), is(true));
+    }
+
     private static JsonNode nonEmptyJsonNode() {
         ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("someKey", "someValue");
         return node;
+    }
+
+    private WithPrimitiveFields objectMissingStringField() {
+        return new WithPrimitiveFields(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
     }
 
     private static class WithPrimitiveFields {
@@ -162,6 +169,19 @@ public class DoesNotHaveEmptyValuesTest {
 
         public Integer getSomeIntField() {
             return someIntField;
+        }
+    }
+
+    private static class ClassWithUri {
+
+        private final URI uri;
+
+        private ClassWithUri(URI uri) {
+            this.uri = uri;
+        }
+
+        public URI getUri() {
+            return uri;
         }
     }
 }

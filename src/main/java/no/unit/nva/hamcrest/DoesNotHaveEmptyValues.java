@@ -7,6 +7,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +26,18 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
     private final List<PropertyValuePair> emptyFields;
+    private final List<Class> ignoreList = List.of(
+        String.class,
+        Integer.class,
+        Double.class,
+        Float.class,
+        Boolean.class,
+        Map.class,
+        Collection.class,
+        JsonNode.class,
+        Class.class,
+        URI.class
+    );
 
     public DoesNotHaveEmptyValues() {
         super();
@@ -68,10 +81,16 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     private void checkRecursivelyForEmptyFields(String fieldPath, PropertyValuePair propValue) {
-        if (isNotBaseType(propValue.getValue())) {
+        if (isNotBaseType(propValue.getValue()) && shouldNotBeIgnored(propValue.getValue())) {
             String valueFieldPath = updateFieldPath(fieldPath, propValue);
             check(propValue.getValue(), valueFieldPath);
         }
+    }
+
+    private boolean shouldNotBeIgnored(Object value) {
+        return
+            ignoreList.stream()
+                .noneMatch(ignoredClass -> ignoredClass.isInstance(value));
     }
 
     private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs, String fieldPath) {
@@ -99,9 +118,11 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     private boolean isNotBaseType(Object value) {
+
         return !
             (
                 isNull(value)
+                || value.getClass().isPrimitive()
                 || value instanceof String
                 || value instanceof Integer
                 || value instanceof Double
@@ -132,6 +153,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
             || isEmptyMap(value)
             || isEmptyJsonNode(value);
     }
+
+
 
     private boolean isEmptyMap(Object value) {
         if (value instanceof Map) {
