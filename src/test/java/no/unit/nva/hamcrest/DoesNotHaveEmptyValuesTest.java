@@ -1,7 +1,10 @@
 package no.unit.nva.hamcrest;
 
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.EMPTY_FIELD_ERROR;
+import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValues;
 import static no.unit.nva.hamcrest.PropertyValuePair.FIELD_PATH_DELIMITER;
+import static no.unit.nva.hamcrest.PropertyValuePair.LEFT_BRACE;
+import static no.unit.nva.hamcrest.PropertyValuePair.RIGHT_BRACE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
@@ -134,7 +137,20 @@ public class DoesNotHaveEmptyValuesTest {
 
         ClassWithChildrenWithMultipleFields testObject =
             new ClassWithChildrenWithMultipleFields(SAMPLE_STRING, ignoredObjectWithEmptyProperties, SAMPLE_INT);
-        assertThat(testObject, DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringClasses(List.of(WithBaseTypes.class)));
+        assertThat(testObject,
+            DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringClasses(List.of(WithBaseTypes.class)));
+    }
+
+    @Test
+    public void matchesReturnsFalseWhenListElementHasEmptyValues() {
+        WithBaseTypes objectWithSomeEmptyValue =
+            new WithBaseTypes(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
+        ClassWithList withList = new ClassWithList(List.of(objectWithSomeEmptyValue));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(withList, doesNotHaveEmptyValues()));
+        String expectedFieldName = "listWithIncompleteEntries";
+        int expectedIndex = 0;
+        assertThat(error.getMessage(), containsString(expectedFieldName));
+        assertThat(error.getMessage(), containsString(LEFT_BRACE + expectedIndex + RIGHT_BRACE));
     }
 
     private static JsonNode nonEmptyJsonNode() {
@@ -221,6 +237,19 @@ public class DoesNotHaveEmptyValuesTest {
 
         public URI getUri() {
             return uri;
+        }
+    }
+
+    private static class ClassWithList {
+
+        private final List<WithBaseTypes> listWithIncompleteEntries;
+
+        public ClassWithList(List<WithBaseTypes> listWithIncompleteEntries) {
+            this.listWithIncompleteEntries = listWithIncompleteEntries;
+        }
+
+        public List<WithBaseTypes> getListWithIncompleteEntries() {
+            return listWithIncompleteEntries;
         }
     }
 }

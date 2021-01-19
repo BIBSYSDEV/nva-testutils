@@ -13,12 +13,11 @@ import org.hamcrest.Description;
 
 public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
-
     public static final String EMPTY_FIELD_ERROR = "Empty field found: ";
     public static final String FIELD_DELIMITER = ",";
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
-    private final List<PropertyValuePair>  emptyFields;
+    private final List<PropertyValuePair> emptyFields;
     private List<Class<?>> stopRecursionClasses;
 
     public DoesNotHaveEmptyValues() {
@@ -84,6 +83,11 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     private void checkRecursivelyForEmptyFields(PropertyValuePair propValue) {
+        if (propValue.isCollection()) {
+            List<PropertyValuePair> collectionElements =
+                propValue.createPropertyValuePairsForEachCollectionItem();
+            collectionElements.forEach(this::check);
+        }
         if (propValue.isNotBaseType() && shouldNotBeIgnored(propValue.getValue())) {
             check(propValue);
         }
@@ -100,7 +104,6 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
             .filter(propertyValue -> isEmpty(propertyValue.getValue()))
             .collect(Collectors.toList());
     }
-
 
     private boolean isEmpty(Object value) {
         if (isNull(value)) {

@@ -1,14 +1,17 @@
 package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,18 +21,27 @@ public class PropertyValuePair {
     public static final String ERROR_INVOKING_GETTER = "Could not get value for method: ";
     public static final String FIELD_PATH_DELIMITER = ".";
     public static final String ROOT_OBJECT_PATH = "";
+    public static final String ARRAY_INDEX = ":";
+    public static final String LEFT_BRACE = "[";
+    public static final String RIGHT_BRACE = "]";
     private final String propertyName;
     private final Object value;
     private final String fieldPath;
+    private final String parentPath;
 
     public PropertyValuePair(String propertyName, Object value, String parentPath) {
         this.propertyName = propertyName;
         this.value = value;
+        this.parentPath = parentPath;
         this.fieldPath = formatFieldPathInfo(propertyName, parentPath);
     }
 
     public static PropertyValuePair rootObject(Object object) {
         return new PropertyValuePair(null, object, ROOT_OBJECT_PATH);
+    }
+
+    public static PropertyValuePair collectionElement(String propertyName, Object value, String parentPath, int index) {
+        return new PropertyValuePair(propertyName + formatArrayIndex(index), value, parentPath);
     }
 
     public String getPropertyName() {
@@ -70,6 +82,28 @@ public class PropertyValuePair {
                 || value instanceof Collection
                 || value instanceof JsonNode
             );
+    }
+
+    public boolean isCollection() {
+        return nonNull(value) && value instanceof Collection;
+    }
+
+    public List<PropertyValuePair> createPropertyValuePairsForEachCollectionItem() {
+        Collection<?> values = (Collection<?>) getValue();
+        List<PropertyValuePair> collectionElements = new ArrayList<>();
+        int index = 0;
+        Iterator<?> iterator = values.iterator();
+        while (iterator.hasNext()) {
+            Object currentValue = iterator.next();
+            PropertyValuePair newElement = collectionElement(getPropertyName(), currentValue, parentPath, index);
+            collectionElements.add(newElement);
+            index++;
+        }
+        return collectionElements;
+    }
+
+    private static String formatArrayIndex(int index) {
+        return LEFT_BRACE + index + RIGHT_BRACE;
     }
 
     private String formatFieldPathInfo(String propertyName, String parentPath) {
