@@ -21,7 +21,6 @@ public class PropertyValuePair {
     public static final String ERROR_INVOKING_GETTER = "Could not get value for field: ";
     public static final String FIELD_PATH_DELIMITER = ".";
     public static final String ROOT_OBJECT_PATH = "";
-    public static final String ARRAY_INDEX = ":";
     public static final String LEFT_BRACE = "[";
     public static final String RIGHT_BRACE = "]";
     private final String propertyName;
@@ -140,7 +139,8 @@ public class PropertyValuePair {
                 this.fieldPath
             );
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(ERROR_INVOKING_GETTER + fieldPath, e);
+            String fieldName = this.fieldPath + FIELD_PATH_DELIMITER +propertyDescriptor.getName();
+            throw new RuntimeException(ERROR_INVOKING_GETTER + fieldName, e);
         }
     }
 }

@@ -3,6 +3,7 @@ package no.unit.nva.hamcrest;
 import static java.util.Objects.isNull;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +23,7 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     public DoesNotHaveEmptyValues() {
         super();
-        stopRecursionClasses = doNotCheckRecursively();
+        stopRecursionClasses = classesWithNoPojoStructure();
 
         this.emptyFields = new ArrayList<>();
     }
@@ -78,8 +79,12 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
             .appendText(emptyFieldNames);
     }
 
-    private List<Class<?>> doNotCheckRecursively() {
-        return List.of(URI.class);
+    /*Classes that their fields do not have getters*/
+    private List<Class<?>> classesWithNoPojoStructure() {
+        return List.of(
+            URI.class,
+            URL.class
+        );
     }
 
     private void checkRecursivelyForEmptyFields(PropertyValuePair propValue) {
