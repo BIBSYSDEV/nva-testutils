@@ -48,8 +48,7 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
     public void describeMismatch(Object item, Description description) {
         String emptyFieldNames = emptyFields.stream()
             .map(res -> res.propertyName)
-            .collect(Collectors.joining(
-                FIELD_DELIMITER));
+            .collect(Collectors.joining(FIELD_DELIMITER));
 
         description.appendText("The following fields were found empty:")
             .appendText(emptyFieldNames);

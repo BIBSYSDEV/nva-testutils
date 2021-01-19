@@ -19,11 +19,11 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
     private final List<PropertyValuePair>  emptyFields;
-    private List<Class<?>> ignoreList;
+    private List<Class<?>> stopRecursionClasses;
 
     public DoesNotHaveEmptyValues() {
         super();
-        ignoreList = doNotCheckRecursively();
+        stopRecursionClasses = doNotCheckRecursively();
 
         this.emptyFields = new ArrayList<>();
     }
@@ -42,16 +42,15 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
      */
     public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(List<Class<?>> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
-        ArrayList<Class<?>> newIgnoreList = new ArrayList<>();
-        newIgnoreList.addAll(matcher.ignoreList);
-        newIgnoreList.addAll(ignoreList);
-        matcher.ignoreList = newIgnoreList;
+        ArrayList<Class<?>> newStopRecursionClasses = new ArrayList<>();
+        newStopRecursionClasses.addAll(matcher.stopRecursionClasses);
+        newStopRecursionClasses.addAll(ignoreList);
+        matcher.stopRecursionClasses = newStopRecursionClasses;
         return matcher;
     }
 
     @Override
     public boolean matches(Object actual) {
-
         return check(PropertyValuePair.rootObject(actual));
     }
 
@@ -81,18 +80,7 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     private List<Class<?>> doNotCheckRecursively() {
-        return List.of(
-            String.class,
-            Integer.class,
-            Double.class,
-            Float.class,
-            Boolean.class,
-            Map.class,
-            Collection.class,
-            JsonNode.class,
-            Class.class,
-            URI.class
-        );
+        return List.of(URI.class);
     }
 
     private void checkRecursivelyForEmptyFields(PropertyValuePair propValue) {
@@ -103,8 +91,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     private boolean shouldNotBeIgnored(Object value) {
         return
-            ignoreList.stream()
-                .noneMatch(ignoredClass -> ignoredClass.isInstance(value));
+            stopRecursionClasses.stream()
+                .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
     }
 
     private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs) {

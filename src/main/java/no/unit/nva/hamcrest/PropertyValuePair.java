@@ -25,20 +25,7 @@ public class PropertyValuePair {
     public PropertyValuePair(String propertyName, Object value, String parentPath) {
         this.propertyName = propertyName;
         this.value = value;
-
         this.fieldPath = formatFieldPathInfo(propertyName, parentPath);
-    }
-
-    private String formatFieldPathInfo(String propertyName, String parentPath) {
-        if (isRootObject()) {
-            return ROOT_OBJECT_PATH;
-        } else {
-            return parentPath + FIELD_PATH_DELIMITER + propertyName;
-        }
-    }
-
-    private boolean isRootObject() {
-        return isNull(propertyName);
     }
 
     public static PropertyValuePair rootObject(Object object) {
@@ -58,14 +45,49 @@ public class PropertyValuePair {
     }
 
     public List<PropertyValuePair> children() {
-        BeanInfo beanInfo = getBeanInfo(value);
-        List<PropertyDescriptor> properties = Arrays.stream(beanInfo.getPropertyDescriptors())
+        List<PropertyDescriptor> properties = collectPropertyDescriptors();
+        return properties.stream()
+            .map(this::extractFieldValue)
             .collect(Collectors.toList());
+    }
 
-        List<PropertyValuePair> result = properties.stream()
-            .map(getter -> extractFieldValues(value, getter))
+    public boolean isNotBaseType() {
+        return !
+            (
+                isNull(value)
+                || value.getClass().isPrimitive()
+                || value instanceof Class
+                || value instanceof String
+                || value instanceof Integer
+                || value instanceof Double
+                || value instanceof Float
+                || value instanceof Boolean
+                || value instanceof Character
+                || value instanceof Byte
+                || value instanceof Short
+                || value instanceof Long
+                || value instanceof Map
+                || value instanceof Collection
+                || value instanceof JsonNode
+            );
+    }
+
+    private String formatFieldPathInfo(String propertyName, String parentPath) {
+        if (isRootObject()) {
+            return ROOT_OBJECT_PATH;
+        } else {
+            return parentPath + FIELD_PATH_DELIMITER + propertyName;
+        }
+    }
+
+    private boolean isRootObject() {
+        return isNull(propertyName);
+    }
+
+    private List<PropertyDescriptor> collectPropertyDescriptors() {
+        BeanInfo beanInfo = getBeanInfo(value);
+        return Arrays.stream(beanInfo.getPropertyDescriptors())
             .collect(Collectors.toList());
-        return result;
     }
 
     private BeanInfo getBeanInfo(Object actual) {
@@ -76,32 +98,15 @@ public class PropertyValuePair {
         }
     }
 
-    private PropertyValuePair extractFieldValues(Object actual, PropertyDescriptor propertyDescriptor) {
+    private PropertyValuePair extractFieldValue(PropertyDescriptor propertyDescriptor) {
         try {
             return new PropertyValuePair(
                 propertyDescriptor.getName(),
-                propertyDescriptor.getReadMethod().invoke(actual),
+                propertyDescriptor.getReadMethod().invoke(value),
                 this.fieldPath
             );
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(ERROR_INVOKING_GETTER + propertyDescriptor.getName(), e);
         }
-    }
-
-    public boolean isNotBaseType() {
-        return !
-            (
-                isNull(value)
-                || value.getClass().isPrimitive()
-                || value instanceof String
-                || value instanceof Integer
-                || value instanceof Double
-                || value instanceof Float
-                || value instanceof Boolean
-                || value instanceof Map
-                || value instanceof Collection
-                || value instanceof JsonNode
-                || value instanceof Class
-            );
     }
 }
