@@ -1,7 +1,7 @@
 package no.unit.nva.hamcrest;
 
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.EMPTY_FIELD_ERROR;
-import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.FIELD_PATH_DELIMITER;
+import static no.unit.nva.hamcrest.PropertyValuePair.FIELD_PATH_DELIMITER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;

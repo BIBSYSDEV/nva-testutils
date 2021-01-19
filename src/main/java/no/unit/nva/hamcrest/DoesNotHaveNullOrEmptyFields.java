@@ -21,7 +21,7 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
     public static final String FIELD_DELIMITER = ",";
     public static final String PROPERTY_READ_ERRROR = "Could not read value for property:";
 
-    private List<PropertyValuePair> emptyFields;
+    private  List<PropertyValuePair> emptyFields;
 
     /**
      * use doesNotHaveEmptyValues instead.

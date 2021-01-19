@@ -2,14 +2,8 @@ package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
 import com.fasterxml.jackson.databind.JsonNode;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +13,12 @@ import org.hamcrest.Description;
 
 public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
-    public static final String ERROR_INVOKING_GETTER = "Could not get value for method: ";
+
     public static final String EMPTY_FIELD_ERROR = "Empty field found: ";
     public static final String FIELD_DELIMITER = ",";
-    public static final String FIELD_PATH_DELIMITER = ".";
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
-    private final List<PropertyValuePair> emptyFields;
+    private final List<PropertyValuePair>  emptyFields;
     private List<Class<?>> ignoreList;
 
     public DoesNotHaveEmptyValues() {
@@ -58,17 +51,16 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     @Override
     public boolean matches(Object actual) {
-        return check(actual, "");
+
+        return check(PropertyValuePair.rootObject(actual));
     }
 
-    public boolean check(Object fieldValue, String fieldPath) {
-        List<PropertyDescriptor> properties = extractProperties(fieldValue);
-        List<PropertyValuePair> propertyValuePairs = constructPropertyValuePairs(fieldValue, properties);
-        for (PropertyValuePair propValue : propertyValuePairs) {
-            checkRecursivelyForEmptyFields(fieldPath, propValue);
+    public boolean check(PropertyValuePair fieldValue) {
+        List<PropertyValuePair> fields = fieldValue.children();
+        for (PropertyValuePair field : fields) {
+            checkRecursivelyForEmptyFields(field);
         }
-        List<PropertyValuePair> emptyValues = collectEmptyFields(propertyValuePairs, fieldPath);
-        emptyFields.addAll(emptyValues);
+        emptyFields.addAll(collectEmptyFields(fields));
         return emptyFields.isEmpty();
     }
 
@@ -103,10 +95,9 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
         );
     }
 
-    private void checkRecursivelyForEmptyFields(String fieldPath, PropertyValuePair propValue) {
-        if (isNotBaseType(propValue.getValue()) && shouldNotBeIgnored(propValue.getValue())) {
-            String valueFieldPath = updateFieldPath(fieldPath, propValue);
-            check(propValue.getValue(), valueFieldPath);
+    private void checkRecursivelyForEmptyFields(PropertyValuePair propValue) {
+        if (propValue.isNotBaseType() && shouldNotBeIgnored(propValue.getValue())) {
+            check(propValue);
         }
     }
 
@@ -116,55 +107,12 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
                 .noneMatch(ignoredClass -> ignoredClass.isInstance(value));
     }
 
-    private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs, String fieldPath) {
+    private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs) {
         return propertyValuePairs.stream()
             .filter(propertyValue -> isEmpty(propertyValue.getValue()))
-            .map(propertyValuePair -> propertyValuePair.updateFieldPath(fieldPath))
             .collect(Collectors.toList());
     }
 
-    private String updateFieldPath(String fieldPath, PropertyValuePair propValue) {
-        return fieldPath + FIELD_PATH_DELIMITER + propValue.getPropertyName();
-    }
-
-    private List<PropertyValuePair> constructPropertyValuePairs(Object fieldValue,
-                                                                List<PropertyDescriptor> properties) {
-        return properties.stream()
-            .map(getter -> extractFieldValues(fieldValue, getter))
-            .collect(Collectors.toList());
-    }
-
-    private List<PropertyDescriptor> extractProperties(Object fieldValue) {
-        BeanInfo beanInfo = getBeanInfo(fieldValue);
-        return Arrays.stream(beanInfo.getPropertyDescriptors())
-            .collect(Collectors.toList());
-    }
-
-    private boolean isNotBaseType(Object value) {
-
-        return !
-            (
-                isNull(value)
-                || value.getClass().isPrimitive()
-                || value instanceof String
-                || value instanceof Integer
-                || value instanceof Double
-                || value instanceof Float
-                || value instanceof Boolean
-                || value instanceof Map
-                || value instanceof Collection
-                || value instanceof JsonNode
-                || value instanceof Class
-            );
-    }
-
-    private BeanInfo getBeanInfo(Object actual) {
-        try {
-            return Introspector.getBeanInfo(actual.getClass());
-        } catch (IntrospectionException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private boolean isEmpty(Object value) {
         if (isNull(value)) {
@@ -207,45 +155,5 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
             return strValue.isBlank();
         }
         return false;
-    }
-
-    private PropertyValuePair extractFieldValues(Object actual, PropertyDescriptor propertyDescriptor) {
-        try {
-            return new PropertyValuePair(
-                propertyDescriptor.getName(),
-                propertyDescriptor.getReadMethod().invoke(actual)
-            );
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(ERROR_INVOKING_GETTER + propertyDescriptor.getName(), e);
-        }
-    }
-
-    private static class PropertyValuePair {
-
-        private final String propertyName;
-        private final Object value;
-        private String fieldPath;
-
-        public PropertyValuePair(String propertyName, Object value) {
-            this.propertyName = propertyName;
-            this.value = value;
-        }
-
-        public String getPropertyName() {
-            return propertyName;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public String getFieldPath() {
-            return fieldPath;
-        }
-
-        public PropertyValuePair updateFieldPath(String parent) {
-            this.fieldPath = parent + FIELD_PATH_DELIMITER + propertyName;
-            return this;
-        }
     }
 }
