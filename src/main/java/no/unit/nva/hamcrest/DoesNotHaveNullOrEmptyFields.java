@@ -1,7 +1,6 @@
 package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -22,8 +21,15 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
     public static final String FIELD_DELIMITER = ",";
     public static final String PROPERTY_READ_ERRROR = "Could not read value for property:";
 
-    private List<PropertyValuePair> emptyFields;
+    private  List<PropertyValuePair> emptyFields;
 
+    /**
+     * use {@link DoesNotHaveEmptyValues#doesNotHaveEmptyValues} instead.
+     *
+     * @param <R> the type of the object
+     * @return a new matcher
+     */
+    @Deprecated
     public static <R> DoesNotHaveNullOrEmptyFields<R> doesNotHaveNullOrEmptyFields() {
         return new DoesNotHaveNullOrEmptyFields<>();
     }
@@ -42,8 +48,7 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
     public void describeMismatch(Object item, Description description) {
         String emptyFieldNames = emptyFields.stream()
             .map(res -> res.propertyName)
-            .collect(Collectors.joining(
-                FIELD_DELIMITER));
+            .collect(Collectors.joining(FIELD_DELIMITER));
 
         description.appendText("The following fields were found empty:")
             .appendText(emptyFieldNames);
