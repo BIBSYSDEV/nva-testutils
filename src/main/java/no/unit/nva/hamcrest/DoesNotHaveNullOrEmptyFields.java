@@ -24,7 +24,7 @@ public class DoesNotHaveNullOrEmptyFields<T> extends BaseMatcher<T> {
     private  List<PropertyValuePair> emptyFields;
 
     /**
-     * use doesNotHaveEmptyValues instead.
+     * use {@link DoesNotHaveEmptyValues#doesNotHaveEmptyValues} instead.
      *
      * @param <R> the type of the object
      * @return a new matcher
