@@ -136,7 +136,7 @@ public class DoesNotHaveEmptyValuesTest {
     }
 
     @Test
-    public void matchesDoesNotCheckFieldInCustomlyAddedIgnoreClass() {
+    public void matchesDoesNotCheckFieldInAdditionalCustomIgnoreClass() {
         WithBaseTypes ignoredObjectWithEmptyProperties =
             new WithBaseTypes(null, null, null, null, null);
 
