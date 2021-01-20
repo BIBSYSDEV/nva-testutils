@@ -99,8 +99,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     private boolean shouldNotBeIgnored(Object value) {
-        return
-            stopRecursionClasses.stream()
+        return stopRecursionClasses
+                .stream()
                 .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
     }
 
@@ -123,32 +123,28 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     private boolean isEmptyMap(Object value) {
         if (value instanceof Map) {
-            Map<?, ?> coll = (Map<?, ?>) value;
-            return coll.isEmpty();
+            return ((Map<?, ?>) value).isEmpty();
         }
         return false;
     }
 
     private boolean isEmptyJsonNode(Object value) {
         if (value instanceof JsonNode) {
-            JsonNode node = (JsonNode) value;
-            return node.isEmpty();
+            return ((JsonNode) value).isEmpty();
         }
         return false;
     }
 
     private boolean isEmptyCollection(Object value) {
         if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            return coll.isEmpty();
+            return ((Collection<?>) value).isEmpty();
         }
         return false;
     }
 
     private boolean isBlankString(Object value) {
         if (value instanceof String) {
-            String strValue = (String) value;
-            return strValue.isBlank();
+            return ((String) value).isBlank();
         }
         return false;
     }

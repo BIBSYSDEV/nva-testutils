@@ -27,6 +27,11 @@ public class DoesNotHaveEmptyValuesTest {
     public static final int SAMPLE_INT = 16;
     public static final String EMPTY_STRING = "";
     private static final JsonNode SAMPLE_JSON_NODE = nonEmptyJsonNode();
+    public static final String INT_FIELD = "intField";
+    public static final String OBJECT_FIELD = "objectWithFields";
+    public static final String STRING_FIELD = "stringField";
+    public static final URI EXAMPLE_URI = URI.create("http://example.com");
+    public static final String LIST_FIELD = "listWithIncompleteEntries";
     private DoesNotHaveEmptyValues<Object> matcher;
 
     @BeforeEach
@@ -65,7 +70,7 @@ public class DoesNotHaveEmptyValuesTest {
         AssertionError exception = assertThrows(AssertionError.class,
             () -> assertThat(withEmptyInt, DoesNotHaveEmptyValues.doesNotHaveEmptyValues()));
         assertThat(exception.getMessage(), containsString(EMPTY_FIELD_ERROR));
-        assertThat(exception.getMessage(), containsString("intField"));
+        assertThat(exception.getMessage(), containsString(INT_FIELD));
     }
 
     @Test
@@ -81,7 +86,7 @@ public class DoesNotHaveEmptyValuesTest {
             new ClassWithChildrenWithMultipleFields(SAMPLE_STRING, objectMissingStringField(), SAMPLE_INT);
         AssertionError error = assertThrows(AssertionError.class,
             () -> assertThat(testObject, DoesNotHaveEmptyValues.doesNotHaveEmptyValues()));
-        assertThat(error.getMessage(), containsString("objectWithFields" + FIELD_PATH_DELIMITER + "stringField"));
+        assertThat(error.getMessage(), containsString(OBJECT_FIELD + FIELD_PATH_DELIMITER + STRING_FIELD));
     }
 
     @Test
@@ -126,12 +131,12 @@ public class DoesNotHaveEmptyValuesTest {
 
     @Test
     public void matchesDoesNotCheckFieldsInIgnoredList() {
-        ClassWithUri withUri = new ClassWithUri(URI.create("http://example.com"));
+        ClassWithUri withUri = new ClassWithUri(EXAMPLE_URI);
         assertThat(matcher.matches(withUri), is(true));
     }
 
     @Test
-    public void matchesDoesNotCheckFieldInCustomlyAddedIngoreClass() {
+    public void matchesDoesNotCheckFieldInCustomlyAddedIgnoreClass() {
         WithBaseTypes ignoredObjectWithEmptyProperties =
             new WithBaseTypes(null, null, null, null, null);
 
@@ -147,7 +152,7 @@ public class DoesNotHaveEmptyValuesTest {
             new WithBaseTypes(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
         ClassWithList withList = new ClassWithList(List.of(objectWithSomeEmptyValue));
         AssertionError error = assertThrows(AssertionError.class, () -> assertThat(withList, doesNotHaveEmptyValues()));
-        String expectedFieldName = "listWithIncompleteEntries";
+        String expectedFieldName = LIST_FIELD;
         int expectedIndex = 0;
         assertThat(error.getMessage(), containsString(expectedFieldName));
         assertThat(error.getMessage(), containsString(LEFT_BRACE + expectedIndex + RIGHT_BRACE));
@@ -155,7 +160,7 @@ public class DoesNotHaveEmptyValuesTest {
 
     private static JsonNode nonEmptyJsonNode() {
         ObjectNode node = new ObjectMapper().createObjectNode();
-        node.put("someKey", "someValue");
+        node.put(SAMPLE_STRING, SAMPLE_STRING);
         return node;
     }
 
