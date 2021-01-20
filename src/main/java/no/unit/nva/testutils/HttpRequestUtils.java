@@ -2,7 +2,6 @@ package no.unit.nva.testutils;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
