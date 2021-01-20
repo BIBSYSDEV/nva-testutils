@@ -1,13 +1,16 @@
 package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.hamcrest.PropertyValuePair.FIELD_PATH_DELIMITER;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -20,10 +23,12 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     private final List<PropertyValuePair> emptyFields;
     private List<Class<?>> stopRecursionClasses;
+    private Set<String> ignoreFields;
 
     public DoesNotHaveEmptyValues() {
         super();
         stopRecursionClasses = classesWithNoPojoStructure();
+        ignoreFields = Collections.emptySet();
 
         this.emptyFields = new ArrayList<>();
     }
@@ -49,13 +54,33 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
         return matcher;
     }
 
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringFields(Set<String> ignoreList) {
+        DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
+        matcher.ignoreFields = addFieldPathDelimiterToRootField(ignoreList);
+        return matcher;
+    }
+
+    private static Set<String> addFieldPathDelimiterToRootField(Set<String> ignoreList) {
+        return ignoreList.stream()
+            .map(DoesNotHaveEmptyValues::addPathDelimiterToFirstField)
+            .collect(Collectors.toSet());
+    }
+
+    private static String addPathDelimiterToFirstField(String f) {
+        if (f.startsWith(FIELD_PATH_DELIMITER)) {
+            return f;
+        } else {
+            return FIELD_PATH_DELIMITER + f;
+        }
+    }
+
     @Override
     public boolean matches(Object actual) {
         return check(PropertyValuePair.rootObject(actual));
     }
 
     public boolean check(PropertyValuePair fieldValue) {
-        List<PropertyValuePair> fields = fieldValue.children();
+        List<PropertyValuePair> fields = fieldValue.children(ignoreFields);
         for (PropertyValuePair field : fields) {
             checkRecursivelyForEmptyFields(field);
         }
@@ -100,8 +125,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     private boolean shouldNotBeIgnored(Object value) {
         return stopRecursionClasses
-                .stream()
-                .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
+            .stream()
+            .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
     }
 
     private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs) {

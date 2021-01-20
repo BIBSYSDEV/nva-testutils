@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PropertyValuePair {
@@ -55,11 +56,16 @@ public class PropertyValuePair {
         return fieldPath;
     }
 
-    public List<PropertyValuePair> children() {
+    public List<PropertyValuePair> children(Set<String> ignoreFields) {
         List<PropertyDescriptor> properties = collectPropertyDescriptors();
         return properties.stream()
             .map(this::extractFieldValue)
+            .filter(propertyValuePair-> fieldIsNotIgnored(ignoreFields, propertyValuePair))
             .collect(Collectors.toList());
+    }
+
+    private boolean fieldIsNotIgnored(Set<String> ignoreFields, PropertyValuePair propertyValuePair) {
+        return !ignoreFields.contains(propertyValuePair.getFieldPath());
     }
 
     public boolean isNotBaseType() {

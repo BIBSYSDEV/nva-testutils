@@ -2,6 +2,7 @@ package no.unit.nva.hamcrest;
 
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.EMPTY_FIELD_ERROR;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValues;
+import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static no.unit.nva.hamcrest.PropertyValuePair.FIELD_PATH_DELIMITER;
 import static no.unit.nva.hamcrest.PropertyValuePair.LEFT_BRACE;
 import static no.unit.nva.hamcrest.PropertyValuePair.RIGHT_BRACE;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -156,6 +158,13 @@ public class DoesNotHaveEmptyValuesTest {
         int expectedIndex = 0;
         assertThat(error.getMessage(), containsString(expectedFieldName));
         assertThat(error.getMessage(), containsString(LEFT_BRACE + expectedIndex + RIGHT_BRACE));
+    }
+
+    @Test
+    public void matchesReturnsTrueWhenIgnoredFieldIsNull() {
+        WithBaseTypes testObject =
+            new WithBaseTypes(null, SAMPLE_INT, SAMPLE_LIST, SAMPLE_MAP, SAMPLE_JSON_NODE);
+        assertThat(testObject,doesNotHaveEmptyValuesIgnoringFields(Set.of(STRING_FIELD)));
     }
 
     private static JsonNode nonEmptyJsonNode() {
