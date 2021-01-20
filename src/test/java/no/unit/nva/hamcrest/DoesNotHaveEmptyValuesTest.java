@@ -30,7 +30,7 @@ public class DoesNotHaveEmptyValuesTest {
     public static final String INT_FIELD = "intField";
     public static final String OBJECT_FIELD = "objectWithFields";
     public static final String STRING_FIELD = "stringField";
-    public static final URI EXAMPLE_URI = URI.create("http://example.com");
+    public static final URI EXAMPLE_URI = URI.create("http://example.org");
     public static final String LIST_FIELD = "listWithIncompleteEntries";
     private DoesNotHaveEmptyValues<Object> matcher;
 
