@@ -60,12 +60,8 @@ public class PropertyValuePair {
         List<PropertyDescriptor> properties = collectPropertyDescriptors();
         return properties.stream()
             .map(this::extractFieldValue)
-            .filter(propertyValuePair-> fieldIsNotIgnored(ignoreFields, propertyValuePair))
+            .filter(propertyValuePair -> fieldIsNotIgnored(ignoreFields, propertyValuePair))
             .collect(Collectors.toList());
-    }
-
-    private boolean fieldIsNotIgnored(Set<String> ignoreFields, PropertyValuePair propertyValuePair) {
-        return !ignoreFields.contains(propertyValuePair.getFieldPath());
     }
 
     public boolean isNotBaseType() {
@@ -111,6 +107,10 @@ public class PropertyValuePair {
         return LEFT_BRACE + index + RIGHT_BRACE;
     }
 
+    private boolean fieldIsNotIgnored(Set<String> ignoreFields, PropertyValuePair propertyValuePair) {
+        return !ignoreFields.contains(propertyValuePair.getFieldPath());
+    }
+
     private String formatFieldPathInfo(String propertyName, String parentPath) {
         if (isRootObject()) {
             return ROOT_OBJECT_PATH;
@@ -145,7 +145,7 @@ public class PropertyValuePair {
                 this.fieldPath
             );
         } catch (IllegalAccessException | InvocationTargetException e) {
-            String fieldName = this.fieldPath + FIELD_PATH_DELIMITER +propertyDescriptor.getName();
+            String fieldName = this.fieldPath + FIELD_PATH_DELIMITER + propertyDescriptor.getName();
             throw new RuntimeException(ERROR_INVOKING_GETTER + fieldName, e);
         }
     }

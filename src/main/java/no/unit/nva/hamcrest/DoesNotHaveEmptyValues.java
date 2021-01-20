@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
     private final List<PropertyValuePair> emptyFields;
-    private List<Class<?>> stopRecursionClasses;
+    private Set<Class<?>> stopRecursionClasses;
     private Set<String> ignoreFields;
 
     public DoesNotHaveEmptyValues() {
@@ -45,9 +46,9 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
      * @param <R>        the type of the object in test.
      * @return a matcher.
      */
-    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(List<Class<?>> ignoreList) {
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(Set<Class<?>> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
-        ArrayList<Class<?>> newStopRecursionClasses = new ArrayList<>();
+        Set<Class<?>> newStopRecursionClasses = new HashSet<>();
         newStopRecursionClasses.addAll(matcher.stopRecursionClasses);
         newStopRecursionClasses.addAll(ignoreList);
         matcher.stopRecursionClasses = newStopRecursionClasses;
@@ -105,8 +106,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     /*Classes that their fields do not have getters*/
-    private List<Class<?>> classesWithNoPojoStructure() {
-        return List.of(
+    private Set<Class<?>> classesWithNoPojoStructure() {
+        return Set.of(
             URI.class,
             URL.class
         );

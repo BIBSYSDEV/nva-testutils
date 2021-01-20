@@ -145,7 +145,7 @@ public class DoesNotHaveEmptyValuesTest {
         ClassWithChildrenWithMultipleFields testObject =
             new ClassWithChildrenWithMultipleFields(SAMPLE_STRING, ignoredObjectWithEmptyProperties, SAMPLE_INT);
         assertThat(testObject,
-            DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringClasses(List.of(WithBaseTypes.class)));
+            DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringClasses(Set.of(WithBaseTypes.class)));
     }
 
     @Test
