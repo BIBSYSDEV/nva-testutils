@@ -3,7 +3,6 @@ package no.unit.nva.testutils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
 
 public class ExceptionUtilsTest {

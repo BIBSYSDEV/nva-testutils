@@ -1,9 +1,8 @@
 package no.unit.nva.testutils;
 
-import java.util.Map;
-
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import java.util.Map;
 
 public final class TestHeaders {
 

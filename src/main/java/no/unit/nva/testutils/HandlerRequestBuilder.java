@@ -2,7 +2,6 @@ package no.unit.nva.testutils;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
