@@ -1,13 +1,17 @@
 package no.unit.nva.hamcrest;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.hamcrest.PropertyValuePair.FIELD_PATH_DELIMITER;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -19,11 +23,13 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     public static final String TEST_DESCRIPTION = "All fields of all included objects need to be non empty";
 
     private final List<PropertyValuePair> emptyFields;
-    private List<Class<?>> stopRecursionClasses;
+    private Set<Class<?>> stopRecursionClasses;
+    private Set<String> ignoreFields;
 
     public DoesNotHaveEmptyValues() {
         super();
         stopRecursionClasses = classesWithNoPojoStructure();
+        ignoreFields = Collections.emptySet();
 
         this.emptyFields = new ArrayList<>();
     }
@@ -40,13 +46,33 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
      * @param <R>        the type of the object in test.
      * @return a matcher.
      */
-    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(List<Class<?>> ignoreList) {
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(Set<Class<?>> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
-        ArrayList<Class<?>> newStopRecursionClasses = new ArrayList<>();
+        Set<Class<?>> newStopRecursionClasses = new HashSet<>();
         newStopRecursionClasses.addAll(matcher.stopRecursionClasses);
         newStopRecursionClasses.addAll(ignoreList);
         matcher.stopRecursionClasses = newStopRecursionClasses;
         return matcher;
+    }
+
+    public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringFields(Set<String> ignoreList) {
+        DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
+        matcher.ignoreFields = addFieldPathDelimiterToRootField(ignoreList);
+        return matcher;
+    }
+
+    private static Set<String> addFieldPathDelimiterToRootField(Set<String> ignoreList) {
+        return ignoreList.stream()
+            .map(DoesNotHaveEmptyValues::addPathDelimiterToFirstField)
+            .collect(Collectors.toSet());
+    }
+
+    private static String addPathDelimiterToFirstField(String f) {
+        if (f.startsWith(FIELD_PATH_DELIMITER)) {
+            return f;
+        } else {
+            return FIELD_PATH_DELIMITER + f;
+        }
     }
 
     @Override
@@ -55,7 +81,7 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     public boolean check(PropertyValuePair fieldValue) {
-        List<PropertyValuePair> fields = fieldValue.children();
+        List<PropertyValuePair> fields = fieldValue.children(ignoreFields);
         for (PropertyValuePair field : fields) {
             checkRecursivelyForEmptyFields(field);
         }
@@ -80,8 +106,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
     }
 
     /*Classes that their fields do not have getters*/
-    private List<Class<?>> classesWithNoPojoStructure() {
-        return List.of(
+    private Set<Class<?>> classesWithNoPojoStructure() {
+        return Set.of(
             URI.class,
             URL.class
         );
@@ -100,8 +126,8 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     private boolean shouldNotBeIgnored(Object value) {
         return stopRecursionClasses
-                .stream()
-                .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
+            .stream()
+            .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
     }
 
     private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs) {
