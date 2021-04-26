@@ -1,9 +1,12 @@
 package no.unit.nva.stubs;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.testutils.IoUtils;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -15,24 +18,74 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class FakeS3Client implements S3Client {
 
-    private final List<String> suppliedFilenames;
+    private final Map<String, InputStream> filesAndContent;
 
     public FakeS3Client(String... filesInBucket) {
-        suppliedFilenames = Arrays.asList(filesInBucket);
+        this(readResourceFiles(filesInBucket));
+    }
+
+    public FakeS3Client(Map<String, InputStream> filesAndContent) {
+        this.filesAndContent = filesAndContent;
     }
 
     @Override
     public <ReturnT> ReturnT getObject(GetObjectRequest getObjectRequest,
                                        ResponseTransformer<GetObjectResponse, ReturnT> responseTransformer) {
         String filename = getObjectRequest.key();
-        InputStream inputStream = IoUtils.inputStreamFromResources(filename);
-        byte[] contentBytes = readBytesFromResource(filename);
+        InputStream inputStream = extractInputStream(filename);
+        byte[] contentBytes = readAllBytes(inputStream);
         GetObjectResponse response = GetObjectResponse.builder().contentLength((long) contentBytes.length).build();
-        return transformResponse(responseTransformer, inputStream, response);
+        return transformResponse(responseTransformer, new ByteArrayInputStream(contentBytes), response);
+    }
+
+    @Override
+    public ListObjectsResponse listObjects(ListObjectsRequest listObjectsRequest)
+        throws AwsServiceException, SdkClientException {
+        List<S3Object> files = filesAndContent
+                                   .keySet()
+                                   .stream()
+                                   .map(filename -> S3Object.builder().key(filename).build())
+                                   .collect(Collectors.toList());
+
+        return ListObjectsResponse.builder().contents(files).isTruncated(false).build();
+    }
+
+    @Override
+    public String serviceName() {
+        return "FakeS3Client";
+    }
+
+    @Override
+    public void close() {
+
+    }
+
+    private static Map<String, InputStream> readResourceFiles(String[] filesInBucket) {
+        List<String> suppliedFilenames = Arrays.asList(filesInBucket);
+        return suppliedFilenames.stream()
+                   .map(filename -> new SimpleEntry<>(filename, IoUtils.inputStreamFromResources(filename)))
+                   .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+    }
+
+    private byte[] readAllBytes(InputStream inputStream) {
+        try {
+            return inputStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private InputStream extractInputStream(String filename) {
+        if (filesAndContent.containsKey(filename)) {
+            return filesAndContent.get(filename);
+        } else {
+            throw NoSuchKeyException.builder().message("File does not exist:" + filename).build();
+        }
     }
 
     private <ReturnT> ReturnT transformResponse(ResponseTransformer<GetObjectResponse, ReturnT> responseTransformer,
@@ -50,25 +103,5 @@ public class FakeS3Client implements S3Client {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public ListObjectsResponse listObjects(ListObjectsRequest listObjectsRequest)
-        throws AwsServiceException, SdkClientException {
-        List<S3Object> files = suppliedFilenames.stream()
-                                   .map(filename -> S3Object.builder().key(filename).build())
-                                   .collect(Collectors.toList());
-
-        return ListObjectsResponse.builder().contents(files).isTruncated(false).build();
-    }
-
-    @Override
-    public String serviceName() {
-        return "FakeS3Client";
-    }
-
-    @Override
-    public void close() {
-
     }
 }
