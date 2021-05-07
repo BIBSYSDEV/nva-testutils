@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import no.unit.nva.testutils.IoUtils;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.http.AbortableInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -19,6 +20,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class FakeS3Client implements S3Client {
@@ -53,6 +56,15 @@ public class FakeS3Client implements S3Client {
                                    .collect(Collectors.toList());
 
         return ListObjectsResponse.builder().contents(files).isTruncated(false).build();
+    }
+
+    @Override
+    public PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody)
+        throws AwsServiceException,SdkClientException {
+        String path = putObjectRequest.key();
+        InputStream inputStream = requestBody.contentStreamProvider().newStream();
+        this.filesAndContent.put(path, inputStream);
+        return PutObjectResponse.builder().build();
     }
 
     @Override
