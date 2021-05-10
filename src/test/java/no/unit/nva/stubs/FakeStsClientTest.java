@@ -17,4 +17,6 @@ class FakeStsClientTest {
         assertThat(credentials.getSecretAccessKey(), is(equalTo(FakeStsClient.SAMPLE_ACCESS_KEY)));
         assertThat(credentials.getSessionToken(), is(equalTo(FakeStsClient.SAMPLE_SESSION_TOKEN)));
     }
+
+
 }
