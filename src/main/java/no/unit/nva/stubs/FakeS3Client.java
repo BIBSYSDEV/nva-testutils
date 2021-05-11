@@ -7,6 +7,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.testutils.IoUtils;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -33,7 +34,7 @@ public class FakeS3Client implements S3Client {
     }
 
     public FakeS3Client(Map<String, InputStream> filesAndContent) {
-        this.filesAndContent = filesAndContent;
+        this.filesAndContent = new ConcurrentHashMap<>(filesAndContent);
     }
 
     @Override
@@ -47,8 +48,7 @@ public class FakeS3Client implements S3Client {
     }
 
     @Override
-    public ListObjectsResponse listObjects(ListObjectsRequest listObjectsRequest)
-        throws AwsServiceException, SdkClientException {
+    public ListObjectsResponse listObjects(ListObjectsRequest listObjectsRequest) {
         List<S3Object> files = filesAndContent
                                    .keySet()
                                    .stream()
@@ -109,11 +109,4 @@ public class FakeS3Client implements S3Client {
         }
     }
 
-    private byte[] readBytesFromResource(String filename) {
-        try {
-            return IoUtils.inputStreamFromResources(filename).readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
