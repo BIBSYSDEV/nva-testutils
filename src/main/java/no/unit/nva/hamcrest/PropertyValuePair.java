@@ -24,6 +24,8 @@ public class PropertyValuePair {
     public static final String ROOT_OBJECT_PATH = "";
     public static final String LEFT_BRACE = "[";
     public static final String RIGHT_BRACE = "]";
+    public static final String ARRAY_INDEX_INDICATOR = "\\[\\d*\\]";
+    public static final String EMPTY_STRING = "";
     private final String propertyName;
     private final Object value;
     private final String fieldPath;
@@ -108,7 +110,8 @@ public class PropertyValuePair {
     }
 
     private boolean fieldIsNotIgnored(Set<String> ignoreFields, PropertyValuePair propertyValuePair) {
-        return !ignoreFields.contains(propertyValuePair.getFieldPath());
+        String genericFieldPath = propertyValuePair.getFieldPath().replaceAll(ARRAY_INDEX_INDICATOR, EMPTY_STRING);
+        return !ignoreFields.contains(genericFieldPath);
     }
 
     private String formatFieldPathInfo(String propertyName, String parentPath) {
