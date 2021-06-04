@@ -19,7 +19,7 @@ def awsSdk2Version = '2.16.46'
 
 dependencies {
 
-    implementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+    implementation group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.12'
 
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.0'
