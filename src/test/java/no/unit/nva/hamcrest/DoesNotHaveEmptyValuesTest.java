@@ -13,7 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,6 @@ public class DoesNotHaveEmptyValuesTest {
     public static final List<String> SAMPLE_LIST = Collections.singletonList(SAMPLE_STRING);
     public static final int SAMPLE_INT = 16;
     public static final String EMPTY_STRING = "";
-    private static final JsonNode SAMPLE_JSON_NODE = nonEmptyJsonNode();
     public static final String INT_FIELD = "intField";
     public static final String OBJECT_FIELD = "objectWithFields";
     public static final String STRING_FIELD = "stringField";
@@ -37,6 +38,7 @@ public class DoesNotHaveEmptyValuesTest {
     public static final String LIST_FIELD = "listWithIncompleteEntries";
     public static final String MISSING_VALUE_IN_ARRAY_ELEMENT = "listWithIncompleteEntries[0].stringField";
     public static final String GENERIC_PATH_TO_FIELD_IN_ARRAY_ELEMENT = "listWithIncompleteEntries.stringField";
+    private static final JsonNode SAMPLE_JSON_NODE = nonEmptyJsonNode();
     private DoesNotHaveEmptyValues<Object> matcher;
 
     @BeforeEach
@@ -137,9 +139,17 @@ public class DoesNotHaveEmptyValuesTest {
     }
 
     @Test
-    public void matchesDoesNotCheckFieldsInIgnoredList() {
-        ClassWithUri withUri = new ClassWithUri(EXAMPLE_URI);
-        assertThat(matcher.matches(withUri), is(true));
+    public void matchesDoesNotCheckUriFields() {
+        ClassWithUri<URI> withUri = new ClassWithUri<>(EXAMPLE_URI, "aNonEmptyValue");
+        assertThat(withUri, doesNotHaveEmptyValues());
+        assertThat(withUri, doesNotHaveEmptyValuesIgnoringFields(Set.of("someOtherField")));
+    }
+
+    @Test
+    public void matchesDoesNotCheckUrlFields() throws MalformedURLException {
+        ClassWithUri<URL> withUri = new ClassWithUri<>(EXAMPLE_URI.toURL(), "aNonEmptyValue");
+        assertThat(withUri, doesNotHaveEmptyValues());
+        assertThat(withUri, doesNotHaveEmptyValuesIgnoringFields(Set.of("someOtherField")));
     }
 
     @Test
@@ -257,15 +267,21 @@ public class DoesNotHaveEmptyValuesTest {
         }
     }
 
-    private static class ClassWithUri {
+    private static class ClassWithUri<T> {
 
-        private final URI uri;
+        private final T uri;
+        private final String someOtherField;
 
-        private ClassWithUri(URI uri) {
+        private ClassWithUri(T uri, String someOtherField) {
             this.uri = uri;
+            this.someOtherField = someOtherField;
         }
 
-        public URI getUri() {
+        public String getSomeOtherField() {
+            return someOtherField;
+        }
+
+        public T getUri() {
             return uri;
         }
     }

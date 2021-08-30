@@ -48,31 +48,15 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
      */
     public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringClasses(Set<Class<?>> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
-        Set<Class<?>> newStopRecursionClasses = new HashSet<>();
-        newStopRecursionClasses.addAll(matcher.stopRecursionClasses);
-        newStopRecursionClasses.addAll(ignoreList);
-        matcher.stopRecursionClasses = newStopRecursionClasses;
+        initializeClassesWhereRecursiveFieldCheckingWillStop(ignoreList, matcher);
         return matcher;
     }
 
     public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringFields(Set<String> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
-        matcher.ignoreFields = addFieldPathDelimiterToRootField(ignoreList);
+        Set<String> newIgnoredFields = addFieldPathDelimiterToRootField(ignoreList);
+        matcher.ignoreFields = newIgnoredFields;
         return matcher;
-    }
-
-    private static Set<String> addFieldPathDelimiterToRootField(Set<String> ignoreList) {
-        return ignoreList.stream()
-            .map(DoesNotHaveEmptyValues::addPathDelimiterToFirstField)
-            .collect(Collectors.toSet());
-    }
-
-    private static String addPathDelimiterToFirstField(String f) {
-        if (f.startsWith(FIELD_PATH_DELIMITER)) {
-            return f;
-        } else {
-            return FIELD_PATH_DELIMITER + f;
-        }
     }
 
     @Override
@@ -103,6 +87,28 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
         description.appendText(EMPTY_FIELD_ERROR)
             .appendText(emptyFieldNames);
+    }
+
+    private static <R> void initializeClassesWhereRecursiveFieldCheckingWillStop(Set<Class<?>> ignoreList,
+                                                                                 DoesNotHaveEmptyValues<R> matcher) {
+        Set<Class<?>> newStopRecursionClasses = new HashSet<>();
+        newStopRecursionClasses.addAll(matcher.stopRecursionClasses);
+        newStopRecursionClasses.addAll(ignoreList);
+        matcher.stopRecursionClasses = newStopRecursionClasses;
+    }
+
+    private static Set<String> addFieldPathDelimiterToRootField(Set<String> ignoreList) {
+        return ignoreList.stream()
+            .map(DoesNotHaveEmptyValues::addPathDelimiterToFirstField)
+            .collect(Collectors.toSet());
+    }
+
+    private static String addPathDelimiterToFirstField(String f) {
+        if (f.startsWith(FIELD_PATH_DELIMITER)) {
+            return f;
+        } else {
+            return FIELD_PATH_DELIMITER + f;
+        }
     }
 
     /*Classes that their fields do not have getters*/
