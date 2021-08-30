@@ -45,11 +45,6 @@ public class FakeStsClient implements AWSSecurityTokenService {
     }
 
     @Override
-    public AssumeRoleResult assumeRole(AssumeRoleRequest assumeRoleRequest) {
-        return sts.assumeRole(assumeRoleRequest);
-    }
-
-    @Override
     public void setEndpoint(String endpoint) {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
     }
@@ -57,6 +52,11 @@ public class FakeStsClient implements AWSSecurityTokenService {
     @Override
     public void setRegion(Region region) {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_MOCK_STS_CLIENT);
+    }
+
+    @Override
+    public AssumeRoleResult assumeRole(AssumeRoleRequest assumeRoleRequest) {
+        return sts.assumeRole(assumeRoleRequest);
     }
 
     @Override
@@ -123,6 +123,6 @@ public class FakeStsClient implements AWSSecurityTokenService {
 
     private Credentials fakeCredentials() {
         return new Credentials(SAMPLE_ACCESS_KEY_ID, SAMPLE_ACCESS_KEY, SAMPLE_SESSION_TOKEN,
-            Date.from(Instant.now().plus(Duration.ofDays(10))));
+                               Date.from(Instant.now().plus(Duration.ofDays(10))));
     }
 }

@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.stream.Collectors;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -54,22 +55,18 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     public static <R> DoesNotHaveEmptyValues<R> doesNotHaveEmptyValuesIgnoringFields(Set<String> ignoreList) {
         DoesNotHaveEmptyValues<R> matcher = new DoesNotHaveEmptyValues<>();
-        Set<String> newIgnoredFields = addFieldPathDelimiterToRootField(ignoreList);
-        matcher.ignoreFields = newIgnoredFields;
+        matcher.ignoreFields = addFieldPathDelimiterToRootField(ignoreList);
         return matcher;
     }
 
     @Override
     public boolean matches(Object actual) {
-        return check(PropertyValuePair.rootObject(actual));
+        return objectDoesNotHaveFieldsWithEmptyValues(PropertyValuePair.rootObject(actual));
     }
 
-    public boolean check(PropertyValuePair fieldValue) {
-        List<PropertyValuePair> fields = fieldValue.children(ignoreFields);
-        for (PropertyValuePair field : fields) {
-            checkRecursivelyForEmptyFields(field);
-        }
-        emptyFields.addAll(collectEmptyFields(fields));
+    public boolean objectDoesNotHaveFieldsWithEmptyValues(PropertyValuePair fieldValue) {
+        List<PropertyValuePair> fieldsToBeChecked = createListWithFieldsToBeChecked(fieldValue);
+        emptyFields.addAll(collectEmptyFields(fieldsToBeChecked));
         return emptyFields.isEmpty();
     }
 
@@ -99,16 +96,50 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
 
     private static Set<String> addFieldPathDelimiterToRootField(Set<String> ignoreList) {
         return ignoreList.stream()
-            .map(DoesNotHaveEmptyValues::addPathDelimiterToFirstField)
+            .map(DoesNotHaveEmptyValues::addPathDelimiterToTopLevelFields)
             .collect(Collectors.toSet());
     }
 
-    private static String addPathDelimiterToFirstField(String f) {
+    private static String addPathDelimiterToTopLevelFields(String f) {
         if (f.startsWith(FIELD_PATH_DELIMITER)) {
             return f;
         } else {
             return FIELD_PATH_DELIMITER + f;
         }
+    }
+
+    private List<PropertyValuePair> createListWithFieldsToBeChecked(PropertyValuePair rootObject) {
+        List<PropertyValuePair> fieldsToBeChecked = new ArrayList<>();
+        Stack<PropertyValuePair> fieldsToBeVisited = initializeFieldsToBeVisited(rootObject);
+        while (!fieldsToBeVisited.isEmpty()) {
+            PropertyValuePair currentField = fieldsToBeVisited.pop();
+            if (currentField.shouldBeChecked(stopRecursionClasses, ignoreFields)) {
+                addNestedFieldsToFieldsToBeVisited(fieldsToBeVisited, currentField);
+                fieldsToBeChecked.add(currentField);
+            }
+        }
+        return fieldsToBeChecked;
+    }
+
+    private Stack<PropertyValuePair> initializeFieldsToBeVisited(PropertyValuePair rootObject) {
+        Stack<PropertyValuePair> fieldsToBeVisited = new Stack<>();
+        fieldsToBeVisited.add(rootObject);
+        return fieldsToBeVisited;
+    }
+
+    private void addNestedFieldsToFieldsToBeVisited(Stack<PropertyValuePair> fieldsToBeVisited,
+                                                    PropertyValuePair currentField) {
+        if (currentField.isComplexObject()) {
+            fieldsToBeVisited.addAll(currentField.children());
+        } else if (currentField.isCollection()) {
+            addEachArrayElementAsFieldToBeVisited(fieldsToBeVisited, currentField);
+        }
+    }
+
+    private void addEachArrayElementAsFieldToBeVisited(Stack<PropertyValuePair> fieldsToBeVisited,
+                                                       PropertyValuePair currentField) {
+        List<PropertyValuePair> collectionElements = currentField.createPropertyValuePairsForEachCollectionItem();
+        fieldsToBeVisited.addAll(collectionElements);
     }
 
     /*Classes that their fields do not have getters*/
@@ -117,23 +148,6 @@ public class DoesNotHaveEmptyValues<T> extends BaseMatcher<T> {
             URI.class,
             URL.class
         );
-    }
-
-    private void checkRecursivelyForEmptyFields(PropertyValuePair propValue) {
-        if (propValue.isCollection()) {
-            List<PropertyValuePair> collectionElements =
-                propValue.createPropertyValuePairsForEachCollectionItem();
-            collectionElements.forEach(this::check);
-        }
-        if (propValue.isNotBaseType() && shouldNotBeIgnored(propValue.getValue())) {
-            check(propValue);
-        }
-    }
-
-    private boolean shouldNotBeIgnored(Object value) {
-        return stopRecursionClasses
-            .stream()
-            .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
     }
 
     private List<PropertyValuePair> collectEmptyFields(List<PropertyValuePair> propertyValuePairs) {
