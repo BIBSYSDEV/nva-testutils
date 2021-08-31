@@ -58,33 +58,34 @@ public class PropertyValuePair {
         return fieldPath;
     }
 
-    public List<PropertyValuePair> children(Set<String> ignoreFields) {
+    public List<PropertyValuePair> children() {
         List<PropertyDescriptor> properties = collectPropertyDescriptors();
         return properties.stream()
             .map(this::extractFieldValue)
-            .filter(propertyValuePair -> fieldIsNotIgnored(ignoreFields, propertyValuePair))
             .collect(Collectors.toList());
     }
 
-    public boolean isNotBaseType() {
-        return !
-            (
-                isNull(value)
-                || value.getClass().isPrimitive()
-                || value instanceof Class
-                || value instanceof String
-                || value instanceof Integer
-                || value instanceof Double
-                || value instanceof Float
-                || value instanceof Boolean
-                || value instanceof Character
-                || value instanceof Byte
-                || value instanceof Short
-                || value instanceof Long
-                || value instanceof Map
-                || value instanceof Collection
-                || value instanceof JsonNode
-            );
+    public boolean isBaseType() {
+        return isNull(value)
+               || value.getClass().isPrimitive()
+               || value instanceof Class
+               || value instanceof String
+               || value instanceof Integer
+               || value instanceof Double
+               || value instanceof Float
+               || value instanceof Boolean
+               || value instanceof Character
+               || value instanceof Byte
+               || value instanceof Short
+               || value instanceof Long
+               || value instanceof Map
+               || value instanceof Collection
+               || value instanceof JsonNode
+            ;
+    }
+
+    public boolean isComplexObject() {
+        return !isBaseType();
     }
 
     public boolean isCollection() {
@@ -105,13 +106,26 @@ public class PropertyValuePair {
         return collectionElements;
     }
 
+    public boolean shouldBeChecked(Set<Class<?>> stopRecursionClasses, Set<String> ignoredFields) {
+        return classShouldBeChecked(stopRecursionClasses) && fieldShouldBeChecked(ignoredFields);
+    }
+
     private static String formatArrayIndex(int index) {
         return LEFT_BRACE + index + RIGHT_BRACE;
     }
 
-    private boolean fieldIsNotIgnored(Set<String> ignoreFields, PropertyValuePair propertyValuePair) {
-        String genericFieldPath = propertyValuePair.getFieldPath().replaceAll(ARRAY_INDEX_INDICATOR, EMPTY_STRING);
-        return !ignoreFields.contains(genericFieldPath);
+    private boolean classShouldBeChecked(Set<Class<?>> stopRecursionClasses) {
+        return stopRecursionClasses
+            .stream()
+            .noneMatch(stopRecursionClass -> stopRecursionClass.isInstance(value));
+    }
+
+    private boolean fieldShouldBeChecked(Set<String> ignoreFields) {
+        return !ignoreFields.contains(createGenericFieldPath());
+    }
+
+    private String createGenericFieldPath() {
+        return getFieldPath().replaceAll(ARRAY_INDEX_INDICATOR, EMPTY_STRING);
     }
 
     private String formatFieldPathInfo(String propertyName, String parentPath) {

@@ -270,10 +270,17 @@ public class DoesNotHaveEmptyValuesTest {
     private static class ClassWithUri<T> {
 
         private final T uri;
+
+        public List<T> getUris() {
+            return uris;
+        }
+
+        private final List<T> uris;
         private final String someOtherField;
 
         private ClassWithUri(T uri, String someOtherField) {
             this.uri = uri;
+            this.uris = List.of(uri);
             this.someOtherField = someOtherField;
         }
 
