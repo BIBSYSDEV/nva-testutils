@@ -18,6 +18,8 @@ def awsSdk2Version = '2.17.57'
 def mockitoVersion = '4.0.0'
 def hamcrestVersion = '2.2'
 def javaFaker = '1.0.2'
+def apacheCommons= '3.12.0'
+def commonsValidator = '1.7'
 dependencies {
 
     implementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
@@ -31,7 +33,10 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: jacksonVersion
+
     implementation group: 'org.hamcrest', name: 'hamcrest', version: hamcrestVersion
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: apacheCommons
+    implementation group: 'commons-validator', name: 'commons-validator', version: commonsValidator
 
     testImplementation group: 'com.github.javafaker', name: 'javafaker', version: javaFaker
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jupiterVersion
