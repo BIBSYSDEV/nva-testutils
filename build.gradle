@@ -37,8 +37,8 @@ dependencies {
     implementation group: 'org.hamcrest', name: 'hamcrest', version: hamcrestVersion
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: apacheCommons
     implementation group: 'commons-validator', name: 'commons-validator', version: commonsValidator
+    implementation group: 'com.github.javafaker', name: 'javafaker', version: javaFaker
 
-    testImplementation group: 'com.github.javafaker', name: 'javafaker', version: javaFaker
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jupiterVersion
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
 
