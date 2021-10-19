@@ -2,6 +2,7 @@ package no.unit.nva.testutils;
 
 import com.github.javafaker.Faker;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Random;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -34,5 +35,15 @@ public class RandomDataGenerator {
 
     public static String randomIsbn13() {
         return FAKER.code().isbn13();
+    }
+
+    public static <T> T randomElement(T... elements) {
+        return elements[RANDOM.nextInt(elements.length)];
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <T> T randomElement(Collection<T> elements) {
+        Object element = randomElement(elements.toArray());
+        return (T) element;
     }
 }
