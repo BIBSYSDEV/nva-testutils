@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
+ * Use HandlerRequestBuilder.
  * @deprecated use {@link HandlerRequestBuilder}.
  */
 @Deprecated

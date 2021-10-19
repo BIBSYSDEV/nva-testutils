@@ -38,7 +38,8 @@ class HandlerUtilsTest {
         assertNotNull(requestString);
         RequestBody actual = extractBodyFromSerializedRequest(requestString);
         JsonNode json = OBJECT_MAPPER.readTree(requestString);
-        TypeReference<Map<String, String>> type = new TypeReference<>() {};
+        TypeReference<Map<String, String>> type = new TypeReference<>() {
+        };
         Map<String, String> headers = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.HEADERS_FIELD), type);
         Map<String, String> pathParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.PATH_PARAMETERS), type);
         Map<String, String> queryParameters = OBJECT_MAPPER.convertValue(json.get(HandlerUtils.QUERY_PARAMETERS), type);
