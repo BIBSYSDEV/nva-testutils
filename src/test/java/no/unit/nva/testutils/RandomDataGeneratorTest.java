@@ -1,5 +1,6 @@
 package no.unit.nva.testutils;
 
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -7,8 +8,10 @@ import static org.hamcrest.collection.IsIn.in;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import org.apache.commons.validator.routines.ISBNValidator;
+import org.hamcrest.number.OrderingComparison;
 import org.junit.jupiter.api.Test;
 
 class RandomDataGeneratorTest {
@@ -50,16 +53,27 @@ class RandomDataGeneratorTest {
     }
 
     @Test
-    void shouldReturnRandomElementOfArray(){
-        String[] elements = new String[]{"a","b","c"};
+    void shouldReturnRandomElementOfArray() {
+        String[] elements = new String[]{"a", "b", "c"};
         String randomElement = RandomDataGenerator.randomElement(elements);
         assertThat(randomElement, is(in(elements)));
     }
 
     @Test
-    void shouldReturnRandomElementOfCollection(){
+    void shouldReturnRandomElementOfCollection() {
         List<String> elements = List.of("a", "b", "c");
         String randomElement = RandomDataGenerator.randomElement(elements);
         assertThat(randomElement, is(in(elements)));
+    }
+
+    @Test
+    void shouldReturnRandomInstantBeforeNow() {
+        assertThat(randomInstant(), is(OrderingComparison.lessThanOrEqualTo(Instant.now())));
+    }
+
+    @Test
+    void shouldReturnRandomInstantAfterSuppliedDate() {
+        Instant earliestDate = Instant.parse("2007-12-03T10:15:30.00Z");
+        assertThat(randomInstant(earliestDate), is(OrderingComparison.greaterThan(earliestDate)));
     }
 }
